@@ -9,10 +9,17 @@
     <string name="sample_class_id">SJT 304</string>
     <string name="next">Next</string>
     <string name="greeting">Hello,</string>
+    <string name="continue_text">Continue</string>
     <string name="done">Done</string>
     <string name="no_classes_today">No classes today!</string>
     <string name="no_more_classes_today">No More Classes Today</string>
     <string name="no_classes_today_subtext">Catch up on some sleep</string>
+    <string name="no_friends_found">No Friends? </string>
+    <string name="no_friends_found_subtext">Add your friends and see their timetable!</string>
+    <string name="no_requests">Request and Suggestions</string>
+    <string name="no_requests_subtext">Your friend requests and suggested friends will be shown here.</string>
+    <string name="search_text_heading"> Search For Your Friends </string>
+    <string name="search_text_subheading"> Enter their Username </string>
     <string name="intro1_title">Never miss a class</string>
     <string name="intro1_subtitle">Notifications to remind you about your upcoming classes</string>
     <string name="intro2_title">Get a sneak peek</string>
@@ -37,6 +44,7 @@
     <string name="instructions_5">5. When done, click on Confirm.</string>
     <string name="instructions_6">BRAVO! That\'s it. You did it!</string>
     <string name="instructions_7">In addition to this, you can have a sneak peek at your upcoming classes via the Widget.</string>
+    <string name="add_info_desc">Enter username and your registration number below. Your username will help your friends find you!</string>
     <string name="logout">Logout</string>
     <string name="logout_msg">Are you sure?</string>
     <string name="cancel">Cancel</string>
@@ -86,6 +94,9 @@
     <string name="sample_room">SJT101</string>
     <string name="title_schedule">Timetable</string>
     <string name="title_community">Community</string>
+    <string name="fill_all_fields">Fill All Fields!</string>
+    <string name="invalid_regno">Invalid Registration Number!</string>
+    <string name="something_went_wrong">Something Went Wrong!</string>
     <string-array name="no_classes_today_subtext_list">
         <item>Don\'t you have a quiz coming up?</item>
         <item>Finish your DAs!</item>
@@ -116,4 +127,6 @@
         <item>thursday</item>
         <item>friday</item>
     </string-array>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

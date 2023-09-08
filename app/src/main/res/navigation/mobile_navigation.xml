@@ -18,10 +18,22 @@
         <action
             android:id="@+id/action_navigation_community_to_navigation_requests"
             app:destination="@id/navigation_requests" />
+        <action
+            android:id="@+id/action_navigation_community_to_navigation_schedule"
+            app:destination="@id/navigation_schedule" />
     </fragment>
     <fragment
         android:id="@+id/navigation_requests"
         android:name="com.dscvit.vitty.ui.community.RequestsFragment"
         android:label="Requests"
-        tools:layout="@layout/fragment_requests" />
+        tools:layout="@layout/fragment_requests" >
+        <action
+            android:id="@+id/action_navigation_requests_to_searchFragment"
+            app:destination="@id/searchFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/searchFragment"
+        android:name="com.dscvit.vitty.ui.community.SearchFragment"
+        android:label="fragment_search"
+        tools:layout="@layout/fragment_search" />
 </navigation>

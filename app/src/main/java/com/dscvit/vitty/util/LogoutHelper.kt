@@ -45,8 +45,15 @@ object LogoutHelper {
                 putInt(Constants.UPDATE, 0)
                 putString(Constants.UID, "")
                 putBoolean(Constants.FIRST_TIME_SETUP, false)
+                putString(Constants.COMMUNITY_USERNAME, null)
+                putString(Constants.COMMUNITY_TOKEN, null)
+                putString(Constants.COMMUNITY_NAME, null)
+                putString(Constants.COMMUNITY_PICTURE, null)
+                putString(Constants.COMMUNITY_REGNO, null)
+                putBoolean(Constants.COMMUNITY_TIMETABLE_AVAILABLE, false)
                 apply()
             }
+            prefs.edit().clear().apply();
             FirebaseAuth.getInstance().signOut()
             val intent = Intent(context, AuthActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK

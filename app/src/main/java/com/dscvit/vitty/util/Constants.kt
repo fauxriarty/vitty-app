@@ -37,4 +37,11 @@ object Constants {
     const val VIBRATION_MODE = "vib_mode"
     const val SAT_MODE = "sat_mode"
     const val CHANGE_TIMETABLE = "change_timetable"
+
+    const val COMMUNITY_TOKEN = "community_token"
+    const val COMMUNITY_USERNAME = "community_username"
+    const val COMMUNITY_NAME = "community_name"
+    const val COMMUNITY_PICTURE = "community_picture"
+    const val COMMUNITY_REGNO = "community_regno"
+    const val COMMUNITY_TIMETABLE_AVAILABLE = "community_timetable_available"
 }

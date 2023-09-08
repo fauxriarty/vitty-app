@@ -52,7 +52,7 @@ class PeriodAdapter(private val dataSet: ArrayList<PeriodDetails>, private val d
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val item = dataSet[position]
+        val item = dataSet[holder.adapterPosition]
         holder.bind(item)
 
         val startTime: Date = item.startTime.toDate()
@@ -104,13 +104,13 @@ class PeriodAdapter(private val dataSet: ArrayList<PeriodDetails>, private val d
         }
 
         if ((((day + 1) % 7) + 1) == now[Calendar.DAY_OF_WEEK]) {
-            if ((start.before(now) && end.after(now)) || start.equals(now) || (start.after(now) && active == -1) || active == position) {
+            if ((start.before(now) && end.after(now)) || start.equals(now) || (start.after(now) && active == -1) || active == holder.adapterPosition) {
                 holder.activePeriod.visibility = View.VISIBLE
-                active = position
+                active = holder.adapterPosition
             }
         }
 
-        val isExpanded = position == mExpandedPosition
+        val isExpanded = holder.adapterPosition == mExpandedPosition
         holder.apply {
             if (isExpanded) {
                 expandedBackground.visibility = View.VISIBLE
@@ -126,19 +126,19 @@ class PeriodAdapter(private val dataSet: ArrayList<PeriodDetails>, private val d
             itemView.isActivated = isExpanded
         }
 
-        if (isExpanded) previousExpandedPosition = position
+        if (isExpanded) previousExpandedPosition = holder.adapterPosition
 
         holder.itemView.apply {
             setOnClickListener {
                 vibrateOnClick(holder.itemView.context)
-                mExpandedPosition = if (isExpanded) -1 else position
+                mExpandedPosition = if (isExpanded) -1 else holder.adapterPosition
                 notifyItemChanged(previousExpandedPosition)
                 notifyItemChanged(position)
             }
             setOnLongClickListener {
-                mExpandedPosition = position
+                mExpandedPosition = holder.adapterPosition
                 notifyItemChanged(previousExpandedPosition)
-                notifyItemChanged(position)
+                notifyItemChanged(holder.adapterPosition)
                 true
             }
         }

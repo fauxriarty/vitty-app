@@ -1,5 +1,6 @@
 package com.dscvit.vitty.ui.schedule
 
+import android.animation.ObjectAnimator
 import android.app.Activity
 import android.app.PendingIntent
 import android.content.Intent
@@ -7,15 +8,19 @@ import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.MenuInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ImageView
+import android.widget.PopupMenu
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.edit
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import coil.load
 import com.dscvit.vitty.BuildConfig
 import com.dscvit.vitty.R
 import com.dscvit.vitty.activity.InstructionsActivity
@@ -41,6 +46,9 @@ class ScheduleFragment : Fragment() {
     private lateinit var prefs: SharedPreferences
     private var uid = ""
     private val db = FirebaseFirestore.getInstance()
+    private var username: String? = null
+    private var name = ""
+
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -51,11 +59,11 @@ class ScheduleFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val scheduleViewModel =
-            ViewModelProvider(this)[ScheduleViewModel::class.java]
+        //val scheduleViewModel = ViewModelProvider(this)[ScheduleViewModel::class.java]
 
         _binding = FragmentScheduleBinding.inflate(inflater, container, false)
         val root: View = binding.root
+
 
         prefs = requireContext().getSharedPreferences(Constants.USER_INFO, 0)
         uid = prefs.getString("uid", "").toString()
@@ -69,6 +77,38 @@ class ScheduleFragment : Fragment() {
 
         return root
     }
+
+    private fun getUsername(): String? {
+
+        return try{
+            requireArguments().getString("username", null)
+        }catch (e: Exception){
+            null
+        }
+
+    }
+
+    private fun getProfilePicture(): String? {
+
+        return try{
+            requireArguments().getString("profile_picture", null)
+        }catch (e: Exception){
+            prefs.getString(Constants.COMMUNITY_PICTURE, "")
+        }
+
+    }
+
+    private fun getName(): String? {
+
+        return try{
+            requireArguments().getString("name", null)
+        }catch (e: Exception){
+            null
+        }
+
+    }
+
+
 
 
     private fun checkExamMode() {
@@ -115,6 +155,9 @@ class ScheduleFragment : Fragment() {
     }
 
     private fun pageSetup() {
+        username = getUsername()
+        name = getName() ?: ""
+
         val calendar: Calendar = Calendar.getInstance()
         val d = when (calendar.get(Calendar.DAY_OF_WEEK)) {
             Calendar.MONDAY -> 0
@@ -139,53 +182,21 @@ class ScheduleFragment : Fragment() {
 //            UtilFunctions.takeScreenshotAndShare(this, UtilFunctions.getBitmapFromView(rootView))
 //        }
 
-        binding.scheduleToolbar.setOnMenuItemClickListener { menuItem ->
-            when (menuItem.itemId) {
-                R.id.logout -> {
-                    LogoutHelper.logout(requireContext(), requireContext() as Activity, prefs)
-                    true
-                }
-                R.id.settings -> {
-                    startActivity(Intent(context, SettingsActivity::class.java))
-                    true
-                }
-                R.id.support -> {
-                    UtilFunctions.openLink(requireContext(), getString(R.string.telegram_link))
-                    true
-                }
-                R.id.share -> {
-                    val shareIntent = Intent().apply {
-                        action = Intent.ACTION_SEND
-                        type = "text/plain"
-                    }
-                    shareIntent.putExtra(
-                        Intent.EXTRA_TEXT,
-                        getString(R.string.share_text)
-                    )
-                    val pendingIntent = PendingIntent.getBroadcast(
-                        context,
-                        Constants.SHARE_INTENT,
-                        Intent(context, ShareReceiver::class.java),
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
-                            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
-                        else
-                            PendingIntent.FLAG_UPDATE_CURRENT
-                    )
-//                    val broadcastReceiver: BroadcastReceiver = ShareReceiver()
-//                    registerReceiver(broadcastReceiver, IntentFilter(SHARE_ACTION))
-                    startActivity(
-                        Intent.createChooser(
-                            shareIntent,
-                            null,
-                            pendingIntent.intentSender
-                        )
-                    )
-                    true
-                }
-                else -> false
-            }
+
+        showFriendsName()
+
+        binding.profileImage.load(getProfilePicture()) {
+            crossfade(true)
+            placeholder(R.drawable.ic_gdscvit)
+            error(R.drawable.ic_gdscvit)
         }
-        val pagerAdapter = DayAdapter(this)
+
+        binding.profileImage.setOnClickListener {
+            // Open the existing menu when the ImageView is clicked
+            showPopupMenu(it)
+        }
+
+        val pagerAdapter = DayAdapter(this, username)
         binding.pager.adapter = pagerAdapter
         TabLayoutMediator(
             binding.tabs, binding.pager
@@ -193,6 +204,31 @@ class ScheduleFragment : Fragment() {
             .attach()
 
         binding.pager.currentItem = d
+    }
+
+    private fun showFriendsName() {
+        val name = getName()
+        if(name!=null){
+            binding.friendTimetableName.text = "$name's Time Table"
+            binding.friendTimetableName.visibility = View.VISIBLE
+            if (binding.friendTimetableName.visibility != View.VISIBLE) {
+                // Fade in animation
+                val fadeInAnimation = ObjectAnimator.ofFloat(
+                    binding.friendTimetableName,
+                    "alpha",
+                    0f,
+                    1f
+                )
+                fadeInAnimation.duration = 1000 // Adjust the duration as needed
+                fadeInAnimation.start()
+
+                // Make the view visible after the animation
+                binding.friendTimetableName.visibility = View.VISIBLE
+            }
+
+        }else{
+            binding.friendTimetableName.visibility = View.GONE
+        }
     }
 
     private fun firstTimeSetup() {
@@ -279,6 +315,59 @@ class ScheduleFragment : Fragment() {
             5 -> listOf(getString(R.string.new_updates), getString(R.string.about_new_updates))
             else -> listOf(getString(R.string.final_heading), getString(R.string.about_final))
         }
+    }
+
+    private fun showPopupMenu(view: View) {
+        val popupMenu = PopupMenu(requireContext(), view)
+        val inflater = popupMenu.menuInflater
+        inflater.inflate(R.menu.schedule_menu, popupMenu.menu)
+        popupMenu.setOnMenuItemClickListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.logout -> {
+                    LogoutHelper.logout(requireContext(), requireContext() as Activity, prefs)
+                    true
+                }
+                R.id.settings -> {
+                    startActivity(Intent(context, SettingsActivity::class.java))
+                    true
+                }
+                R.id.support -> {
+                    UtilFunctions.openLink(requireContext(), getString(R.string.telegram_link))
+                    true
+                }
+                R.id.share -> {
+                    val shareIntent = Intent().apply {
+                        action = Intent.ACTION_SEND
+                        type = "text/plain"
+                    }
+                    shareIntent.putExtra(
+                        Intent.EXTRA_TEXT,
+                        getString(R.string.share_text)
+                    )
+                    val pendingIntent = PendingIntent.getBroadcast(
+                        context,
+                        Constants.SHARE_INTENT,
+                        Intent(context, ShareReceiver::class.java),
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
+                            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
+                        else
+                            PendingIntent.FLAG_UPDATE_CURRENT
+                    )
+//                    val broadcastReceiver: BroadcastReceiver = ShareReceiver()
+//                    registerReceiver(broadcastReceiver, IntentFilter(SHARE_ACTION))
+                    startActivity(
+                        Intent.createChooser(
+                            shareIntent,
+                            null,
+                            pendingIntent.intentSender
+                        )
+                    )
+                    true
+                }
+                else -> false
+            }
+        }
+        popupMenu.show()
     }
 
     override fun onStart() {
