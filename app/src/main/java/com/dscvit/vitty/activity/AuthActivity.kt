@@ -3,18 +3,30 @@ package com.dscvit.vitty.activity
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.os.Build
 import android.os.Bundle
+import android.os.PowerManager
+import android.provider.Settings
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.edit
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.widget.ViewPager2
 import com.dscvit.vitty.R
 import com.dscvit.vitty.adapter.IntroAdapter
 import com.dscvit.vitty.databinding.ActivityAuthBinding
+import com.dscvit.vitty.ui.auth.AuthViewModel
+import com.dscvit.vitty.util.ArraySaverLoader
+import com.dscvit.vitty.util.Constants
 import com.dscvit.vitty.util.Constants.TOKEN
 import com.dscvit.vitty.util.Constants.UID
 import com.dscvit.vitty.util.Constants.USER_INFO
+import com.dscvit.vitty.util.NotificationHelper
+import com.dscvit.vitty.util.NotificationHelper.setAlarm
+import com.dscvit.vitty.util.UtilFunctions
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -24,6 +36,9 @@ import com.google.android.gms.tasks.Task
 import com.google.android.material.tabs.TabLayoutMediator
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.firestore.Source
+import timber.log.Timber
+import java.util.ArrayList
 
 class AuthActivity : AppCompatActivity() {
 
@@ -34,6 +49,7 @@ class AuthActivity : AppCompatActivity() {
     private lateinit var mGoogleSignInOptions: GoogleSignInOptions
     private lateinit var firebaseAuth: FirebaseAuth
     private lateinit var sharedPref: SharedPreferences
+    private lateinit var authViewModel: AuthViewModel
 
     private val pages = listOf("○", "○", "○")
     private var loginClick = false
@@ -43,18 +59,37 @@ class AuthActivity : AppCompatActivity() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_auth)
         firebaseAuth = FirebaseAuth.getInstance()
         sharedPref = getSharedPreferences(USER_INFO, Context.MODE_PRIVATE)
+        authViewModel = ViewModelProvider(this)[AuthViewModel::class.java]
         configureGoogleSignIn()
         setupUI()
     }
 
     override fun onStart() {
         super.onStart()
+        sharedPref = getSharedPreferences(USER_INFO, Context.MODE_PRIVATE)
+        val isTimeTableAvailable = sharedPref.getBoolean(Constants.COMMUNITY_TIMETABLE_AVAILABLE, false)
+        val token = sharedPref.getString(Constants.COMMUNITY_TOKEN, null)
+        val username = sharedPref.getString(Constants.COMMUNITY_USERNAME, null)
+        val regno = sharedPref.getString(Constants.COMMUNITY_REGNO, null)
         val user = FirebaseAuth.getInstance().currentUser
-        if (user != null) {
-            val intent = Intent(this, InstructionsActivity::class.java)
+        Timber.d("isTimeTableAvailable: $isTimeTableAvailable token: $token username: $username regno: $regno")
+        if (isTimeTableAvailable) {
+            val intent = Intent(this, HomeActivity::class.java)
             startActivity(intent)
             finish()
+        }else if(token!=null && username!=null && regno!=null) {
+                val intent = Intent(this, InstructionsActivity::class.java)
+                startActivity(intent)
+                finish()
+        }else{
+            if (user != null) {
+                val intent = Intent(this, AddInfoActivity::class.java)
+                startActivity(intent)
+                finish()
+            }
         }
+
+
     }
 
     private fun configureGoogleSignIn() {
@@ -138,7 +173,7 @@ class AuthActivity : AppCompatActivity() {
                     firebaseAuthWithGoogle(account)
                 }
             } catch (e: ApiException) {
-                logoutFailed()
+                    logoutFailed()
             }
         }
     }
@@ -150,15 +185,58 @@ class AuthActivity : AppCompatActivity() {
                 loginClick = true
                 val uid = firebaseAuth.currentUser?.uid
                 saveInfo(acct.idToken, uid)
-                val intent = Intent(this, InstructionsActivity::class.java)
-                binding.loadingView.visibility = View.GONE
-                startActivity(intent)
-                finish()
+                authViewModel.signInAndGetTimeTable("","",uid?: "")
+                leadToNextPage()
+
+
             } else {
                 logoutFailed()
             }
         }
     }
+
+    private fun leadToNextPage(){
+
+
+
+        authViewModel.signInResponse.observe(this) {
+            if (it != null) {
+                Timber.d("here--"+it.toString())
+                sharedPref.edit().putString(Constants.COMMUNITY_USERNAME, it.username).apply()
+                sharedPref.edit().putString(Constants.COMMUNITY_TOKEN, it.token).apply()
+                sharedPref.edit().putString(Constants.COMMUNITY_NAME, it.name).apply()
+                sharedPref.edit().putString(Constants.COMMUNITY_PICTURE, it.picture).apply()
+            }else{
+                 val intent = Intent(this, AddInfoActivity::class.java)
+                 binding.loadingView.visibility = View.GONE
+                 startActivity(intent)
+                 finish()
+            }
+        }
+
+        authViewModel.user.observe(this){
+            if(it!=null){
+                val timetableDays = it.timetable?.data
+                if( true /*!timetableDays.Monday.isNullOrEmpty() || !timetableDays.Tuesday.isNullOrEmpty() || !timetableDays.Wednesday.isNullOrEmpty() || !timetableDays.Thursday.isNullOrEmpty() || !timetableDays.Friday.isNullOrEmpty()*/) {
+                    sharedPref.edit().putBoolean(Constants.COMMUNITY_TIMETABLE_AVAILABLE, true).apply()
+                    val intent = Intent(this, HomeActivity::class.java)
+                    startActivity(intent)
+                    finish()
+                    binding.loadingView.visibility = View.GONE
+                }else{
+                    val intent = Intent(this, InstructionsActivity::class.java)
+                    startActivity(intent)
+                    finish()
+                    binding.loadingView.visibility = View.GONE
+                }
+            }
+        }
+    }
+
+
+
+
+
 
     override fun onBackPressed() {
         binding.apply {
