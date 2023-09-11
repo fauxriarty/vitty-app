@@ -27,6 +27,7 @@
         android:usesCleartextTraffic="true">
         <activity
             android:name=".activity.AddInfoActivity"
+            android:windowSoftInputMode="adjustResize"
             android:exported="false" />
         <activity
             android:name=".activity.VITEventsActivity"

@@ -8,15 +8,12 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
-import android.widget.EditText
-import android.widget.Toast
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dscvit.vitty.R
 import com.dscvit.vitty.adapter.SearchAdapter
-import com.dscvit.vitty.databinding.FragmentRequestsBinding
 import com.dscvit.vitty.databinding.FragmentSearchBinding
 import com.dscvit.vitty.network.api.community.responses.user.UserResponse
 import com.dscvit.vitty.util.Constants
@@ -50,6 +47,41 @@ class SearchFragment : Fragment() {
                 }
             }
         }
+
+        handleKeyboardAndNavigation(token)
+
+
+
+        communityViewModel.searchResult.observe(viewLifecycleOwner){
+            Timber.d("SearchResult: $it")
+            if(it!=null){
+                val searchResult = removeSelfAndFriends(it)
+                binding.apply {
+                    if(searchResult.isNotEmpty()){
+                        searchList.scheduleLayoutAnimation()
+                        searchList.adapter =
+                            token?.let { token ->
+                                SearchAdapter(searchResult,
+                                    token, communityViewModel, true)
+                            }
+                        searchList.layoutManager = LinearLayoutManager(context)
+                        noSearchResults.visibility = View.INVISIBLE
+                        searchList.visibility = View.VISIBLE
+                    }else{
+                        searchList.visibility = View.GONE
+                        noSearchResults.visibility = View.VISIBLE
+                    }
+                }
+            }
+        }
+
+
+
+        return root
+    }
+
+    private fun handleKeyboardAndNavigation(token: String?) {
+
         val searchEditText = binding.searchFriendsText
         searchEditText.requestFocus()
         val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
@@ -60,6 +92,7 @@ class SearchFragment : Fragment() {
             0,
             0
         )
+
 
         searchEditText.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -98,41 +131,16 @@ class SearchFragment : Fragment() {
             }
         })
 
-        communityViewModel.searchResult.observe(viewLifecycleOwner){
-            Timber.d("SearchResult: $it")
-            if(it!=null){
-                val searchResult = removeSelfAndFriends(it)
-                binding.apply {
-                    if(searchResult.isNotEmpty()){
-                        searchList.scheduleLayoutAnimation()
-                        searchList.adapter =
-                            token?.let { token ->
-                                SearchAdapter(searchResult,
-                                    token, communityViewModel, true)
-                            }
-                        searchList.layoutManager = LinearLayoutManager(context)
-                        noSearchResults.visibility = View.INVISIBLE
-                        searchList.visibility = View.VISIBLE
-                    }else{
-                        searchList.visibility = View.GONE
-                        noSearchResults.visibility = View.VISIBLE
-                    }
-                }
-            }
-        }
 
-
-
-        return root
     }
+
 
     private fun removeSelfAndFriends(it: List<UserResponse>): List<UserResponse> {
         val filteredList = it.filter { userResponse ->
             userResponse.friend_status != "self"
         }
 
-        //return filteredList
-        return it
+        return filteredList
 
 
     }
