@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import coil.load
 import com.dscvit.vitty.R
 import com.dscvit.vitty.adapter.FriendAdapter
 import com.dscvit.vitty.adapter.SearchAdapter
@@ -46,7 +47,7 @@ class RequestsFragment : Fragment() {
             communityViewModel.getFriendRequest(token)
             communityViewModel.getSuggestedFriends(token)
         }
-        val requestList = binding.requestList
+        val requestLayout = binding.requestLayout
         val suggestedList = binding.suggestedList
 
 
@@ -83,17 +84,19 @@ class RequestsFragment : Fragment() {
                 val requestListParsed = getRequestList(it)
                 if(requestListParsed.isNotEmpty()) {
                     binding.pendingRequestsTextView.visibility = View.VISIBLE
-                    requestList.visibility = View.VISIBLE
-                    requestList.scheduleLayoutAnimation()
-                    requestList.adapter =
-                        token?.let { token ->
-                            SearchAdapter(requestListParsed,
-                                token, communityViewModel, false)
-                        }
-                    requestList.layoutManager = LinearLayoutManager(context)
+                    requestLayout.visibility = View.VISIBLE
+                    binding.icon.load(requestListParsed[requestListParsed.size-1].picture){
+                        crossfade(true)
+                        placeholder(R.drawable.ic_gdscvit)
+                    }
+                    binding.superscriptTextView.text = requestListParsed.size.toString()
                 }
 
             }
+        }
+
+        binding.requestLayout.setOnClickListener {
+            requireView().findNavController().navigate(R.id.action_navigation_requests_to_allRequestFragment)
         }
 
 
@@ -105,7 +108,7 @@ class RequestsFragment : Fragment() {
                 suggestedList.visibility = View.VISIBLE
                 suggestedList.scheduleLayoutAnimation()
                 suggestedList.adapter =
-                    token?.let { token -> SearchAdapter(it, token, communityViewModel, false) }
+                    token?.let { token -> SearchAdapter(it, token, communityViewModel, false, false) }
                 suggestedList.layoutManager = LinearLayoutManager(context)
             }
         }

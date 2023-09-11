@@ -72,51 +72,102 @@
             android:layout_marginStart="20dp"
             android:layout_marginTop="24dp"
             android:layout_marginEnd="20dp"
-            android:visibility="gone"
-            android:text="Pending Requests" />
+            android:text="Pending Requests"
+            android:visibility="gone" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/request_list"
+        <RelativeLayout
+            android:id="@+id/request_layout"
             android:layout_below="@id/pending_requests_text_view"
+            android:layout_marginStart="20dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:clipToPadding="false"
-            android:layoutAnimation="@anim/layout_animation"
-            tools:listitem="@layout/card_friend"
-            android:visibility="gone"
-            android:paddingBottom="10dp"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+            android:visibility="gone">
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/icon"
+                android:layout_width="54dp"
+                android:layout_height="54dp"
+                android:layout_gravity="center"
+                android:layout_marginVertical="16dp"
+                android:adjustViewBounds="true"
+                app:shapeAppearanceOverlay="@style/roundedImageViewRounded"
+                tools:src="@tools:sample/avatars" />
+            <TextView
+                android:id="@+id/superscriptTextView"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_marginStart="-22dp"
+                android:layout_marginTop="12dp"
+                android:layout_toEndOf="@id/icon"
+                android:padding="3dp"
+                android:ellipsize="end"
+                android:gravity="center"
+                android:maxLines="1"
+                android:background="@drawable/circular_background"
+                android:text="2"
+                android:textColor="@color/white"
+                android:textSize="14sp"/>
+
+            <TextView
+                android:id="@+id/requestsHeading"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="18dp"
+                android:layout_toEndOf="@id/icon"
+                android:ellipsize="end"
+                android:gravity="center"
+                style="@style/TitleTextAppearance"
+                android:maxLines="1"
+                android:textSize="14dp"
+                android:text="Follow Requests"
+                android:textColor="@color/white" />
+
+            <TextView
+                android:id="@+id/requestsSubtext"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="40dp"
+                android:layout_toEndOf="@id/icon"
+                android:ellipsize="end"
+                android:gravity="center"
+                android:maxLines="1"
+                android:textSize="14dp"
+                android:text="Accept or reject requests" />
+
+        </RelativeLayout>
+
 
         <TextView
             android:id="@+id/suggested_friends_text_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/request_list"
+            android:layout_below="@id/request_layout"
             android:layout_marginStart="20dp"
             android:layout_marginTop="24dp"
             android:layout_marginEnd="20dp"
-            android:visibility="gone"
             android:layout_marginBottom="20dp"
-            android:text="Suggested Friends" />
+            android:text="Suggested Friends"
+            android:visibility="gone" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/suggested_list"
-            android:layout_below="@id/suggested_friends_text_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_below="@id/suggested_friends_text_view"
             android:clipToPadding="false"
             android:layoutAnimation="@anim/layout_animation"
-            tools:listitem="@layout/card_friend"
-            android:visibility="gone"
             android:paddingBottom="10dp"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+            android:visibility="gone"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            tools:listitem="@layout/card_friend" />
 
 
         <RelativeLayout
             android:id="@+id/no_requests"
-            android:layout_below="@id/search_friends"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_below="@id/search_friends"
             android:orientation="vertical"
             android:visibility="invisible"
             tools:visibility="visible">
@@ -160,7 +211,6 @@
                     android:textSize="20sp" />
             </LinearLayout>
         </RelativeLayout>
-
 
 
     </RelativeLayout>

@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.view.ViewCompat.setNestedScrollingEnabled
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -65,6 +66,8 @@ class DayFragment : Fragment() {
         scheduleViewModel.getUserWithTimeTable(token, username)
         fragID = requireArguments().getString("frag_id")?.toInt()!!
         getData()
+
+        binding.dayList.isNestedScrollingEnabled = false
         return binding.root
     }
 
@@ -165,7 +168,7 @@ class DayFragment : Fragment() {
     }
 
 
-    fun parseTimeToTimestamp(timeString: String): Timestamp {
+    private fun parseTimeToTimestamp(timeString: String): Timestamp {
         try{
             val time = replaceYearIfZero(timeString)
             val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
@@ -187,7 +190,7 @@ class DayFragment : Fragment() {
         }
     }
 
-    fun replaceYearIfZero(dateStr: String): String {
+    private fun replaceYearIfZero(dateStr: String): String {
         if (dateStr.startsWith("0")) {
             // Replace the first 4 characters with "2023"
             return "2023" + dateStr.substring(4)

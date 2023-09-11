@@ -33,6 +33,9 @@
         <action
             android:id="@+id/action_navigation_requests_to_friendFragment"
             app:destination="@id/friendFragment" />
+        <action
+            android:id="@+id/action_navigation_requests_to_allRequestFragment"
+            app:destination="@id/allRequestFragment" />
     </fragment>
     <fragment
         android:id="@+id/searchFragment"
@@ -48,4 +51,13 @@
         android:name="com.dscvit.vitty.ui.community.FriendFragment"
         android:label="fragment_friend"
         tools:layout="@layout/fragment_friend" />
+    <fragment
+        android:id="@+id/allRequestFragment"
+        android:name="com.dscvit.vitty.ui.community.AllRequestFragment"
+        android:label="fragment_all_request"
+        tools:layout="@layout/fragment_all_request" >
+        <action
+            android:id="@+id/action_allRequestFragment_to_friendFragment"
+            app:destination="@id/friendFragment" />
+    </fragment>
 </navigation>

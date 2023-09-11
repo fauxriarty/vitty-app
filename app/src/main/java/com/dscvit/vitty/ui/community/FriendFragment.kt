@@ -50,7 +50,6 @@ class FriendFragment : Fragment() {
 
         setUpPage(name, username, picture, friendStatus)
         Timber.d("FriendFragment: $name $username $picture $friendStatus")
-
         return binding.root
 
 
@@ -105,6 +104,7 @@ class FriendFragment : Fragment() {
         binding.unfriend.visibility = View.GONE
         binding.tabsLayout.visibility = View.GONE
         binding.pager.visibility = View.GONE
+        binding.notFriend.visibility = View.VISIBLE
     }
 
     private fun requestSentLayout() {
@@ -114,6 +114,7 @@ class FriendFragment : Fragment() {
         binding.unfriend.visibility = View.GONE
         binding.tabsLayout.visibility = View.GONE
         binding.pager.visibility = View.GONE
+        binding.notFriend.visibility = View.VISIBLE
     }
 
     private fun sendRequestLayout() {
@@ -124,6 +125,7 @@ class FriendFragment : Fragment() {
 
         binding.tabsLayout.visibility = View.GONE
         binding.pager.visibility = View.GONE
+        binding.notFriend.visibility = View.VISIBLE
     }
 
     private fun setupActions(username: String?, friendStatus: String?) {
@@ -161,7 +163,7 @@ class FriendFragment : Fragment() {
                 )
             )
             .create()
-        dialog.setCanceledOnTouchOutside(false)
+        dialog.setCanceledOnTouchOutside(true)
         dialog.show()
 
         val skip = v.findViewById<Button>(R.id.skip)
@@ -191,7 +193,7 @@ class FriendFragment : Fragment() {
         binding.sendRequest.visibility = View.GONE
         binding.requestSent.visibility = View.GONE
         binding.unfriend.visibility = View.VISIBLE
-
+        binding.notFriend.visibility = View.GONE
         binding.tabsLayout.visibility = View.VISIBLE
         binding.pager.visibility = View.VISIBLE
         setUpTimeTable(username)

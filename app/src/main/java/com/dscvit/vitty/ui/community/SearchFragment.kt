@@ -62,7 +62,7 @@ class SearchFragment : Fragment() {
                         searchList.adapter =
                             token?.let { token ->
                                 SearchAdapter(searchResult,
-                                    token, communityViewModel, true)
+                                    token, communityViewModel, true, false)
                             }
                         searchList.layoutManager = LinearLayoutManager(context)
                         noSearchResults.visibility = View.INVISIBLE
@@ -139,7 +139,6 @@ class SearchFragment : Fragment() {
         val filteredList = it.filter { userResponse ->
             userResponse.friend_status != "self"
         }
-
         return filteredList
 
 

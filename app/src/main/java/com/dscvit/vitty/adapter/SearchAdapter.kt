@@ -28,7 +28,7 @@ import java.util.Date
 import java.util.Locale
 
 class SearchAdapter(dataSet: List<UserResponse>, private val token:String, private val communityViewModel: CommunityViewModel,
-    private val isSearchMode: Boolean) :
+    private val isSearchMode: Boolean, private val isAllReqPage: Boolean) :
     RecyclerView.Adapter<SearchAdapter.ViewHolder>() {
 
     val mutableDataSet = dataSet.toMutableList()
@@ -134,6 +134,11 @@ class SearchAdapter(dataSet: List<UserResponse>, private val token:String, priva
                         R.id.action_searchFragment_to_friendFragment,
                         bundle
                     )
+                }else if(isAllReqPage){
+                        findNavController().navigate(
+                            R.id.action_allRequestFragment_to_friendFragment,
+                            bundle
+                        )
                 }else{
                     findNavController().navigate(
                         R.id.action_navigation_requests_to_friendFragment,
