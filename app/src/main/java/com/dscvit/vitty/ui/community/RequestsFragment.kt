@@ -88,7 +88,7 @@ class RequestsFragment : Fragment() {
                     requestList.adapter =
                         token?.let { token ->
                             SearchAdapter(requestListParsed,
-                                token, communityViewModel)
+                                token, communityViewModel, false)
                         }
                     requestList.layoutManager = LinearLayoutManager(context)
                 }
@@ -105,7 +105,7 @@ class RequestsFragment : Fragment() {
                 suggestedList.visibility = View.VISIBLE
                 suggestedList.scheduleLayoutAnimation()
                 suggestedList.adapter =
-                    token?.let { token -> SearchAdapter(it, token, communityViewModel) }
+                    token?.let { token -> SearchAdapter(it, token, communityViewModel, false) }
                 suggestedList.layoutManager = LinearLayoutManager(context)
             }
         }

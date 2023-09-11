@@ -48,6 +48,7 @@ android {
     }
 
     buildFeatures {
+        viewBinding true
         dataBinding true
     }
 }
@@ -102,4 +103,6 @@ dependencies {
 
     // Timber for logs
     implementation 'com.jakewharton.timber:timber:4.7.1'
+
+    implementation 'com.google.android.material:material:1.9.0'
 }

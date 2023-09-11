@@ -214,6 +214,22 @@ class APICommunityRestClient {
 
     }
 
+    fun unfriend(token: String,username: String, retrofitUserActionListener: RetrofitUserActionListener){
+        val bearerToken = "Bearer $token"
+
+        mApiUser = retrofit.create<APICommunity>(APICommunity::class.java)
+        val apiUnfriendCall = mApiUser!!.deleteFriend(bearerToken, username)
+        apiUnfriendCall.enqueue(object : Callback<PostResponse> {
+            override fun onResponse(call: Call<PostResponse>, response: Response<PostResponse>) {
+                retrofitUserActionListener.onSuccess(call, response.body())
+            }
+
+            override fun onFailure(call: Call<PostResponse>, t: Throwable) {
+                retrofitUserActionListener.onError(call, t)
+            }
+        })
+    }
+
     fun checkUsername(username: String, retrofitUserActionListener: RetrofitUserActionListener) {
         mApiUser = retrofit.create<APICommunity>(APICommunity::class.java)
         val usernameRequestBody = UsernameRequestBody(username)

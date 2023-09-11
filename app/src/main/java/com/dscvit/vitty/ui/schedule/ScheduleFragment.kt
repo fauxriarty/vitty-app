@@ -47,8 +47,6 @@ class ScheduleFragment : Fragment() {
     private var uid = ""
     private val db = FirebaseFirestore.getInstance()
     private var username: String? = null
-    private var name = ""
-
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -78,35 +76,8 @@ class ScheduleFragment : Fragment() {
         return root
     }
 
-    private fun getUsername(): String? {
 
-        return try{
-            requireArguments().getString("username", null)
-        }catch (e: Exception){
-            null
-        }
 
-    }
-
-    private fun getProfilePicture(): String? {
-
-        return try{
-            requireArguments().getString("profile_picture", null)
-        }catch (e: Exception){
-            prefs.getString(Constants.COMMUNITY_PICTURE, "")
-        }
-
-    }
-
-    private fun getName(): String? {
-
-        return try{
-            requireArguments().getString("name", null)
-        }catch (e: Exception){
-            null
-        }
-
-    }
 
 
 
@@ -155,8 +126,7 @@ class ScheduleFragment : Fragment() {
     }
 
     private fun pageSetup() {
-        username = getUsername()
-        name = getName() ?: ""
+        username = prefs.getString(Constants.COMMUNITY_USERNAME, "")
 
         val calendar: Calendar = Calendar.getInstance()
         val d = when (calendar.get(Calendar.DAY_OF_WEEK)) {
@@ -183,9 +153,8 @@ class ScheduleFragment : Fragment() {
 //        }
 
 
-        showFriendsName()
-
-        binding.profileImage.load(getProfilePicture()) {
+        val profilePicture = prefs.getString(Constants.COMMUNITY_PICTURE, "")
+        binding.profileImage.load(profilePicture) {
             crossfade(true)
             placeholder(R.drawable.ic_gdscvit)
             error(R.drawable.ic_gdscvit)
@@ -206,30 +175,7 @@ class ScheduleFragment : Fragment() {
         binding.pager.currentItem = d
     }
 
-    private fun showFriendsName() {
-        val name = getName()
-        if(name!=null){
-            binding.friendTimetableName.text = "$name's Time Table"
-            binding.friendTimetableName.visibility = View.VISIBLE
-            if (binding.friendTimetableName.visibility != View.VISIBLE) {
-                // Fade in animation
-                val fadeInAnimation = ObjectAnimator.ofFloat(
-                    binding.friendTimetableName,
-                    "alpha",
-                    0f,
-                    1f
-                )
-                fadeInAnimation.duration = 1000 // Adjust the duration as needed
-                fadeInAnimation.start()
 
-                // Make the view visible after the animation
-                binding.friendTimetableName.visibility = View.VISIBLE
-            }
-
-        }else{
-            binding.friendTimetableName.visibility = View.GONE
-        }
-    }
 
     private fun firstTimeSetup() {
         val max = 6

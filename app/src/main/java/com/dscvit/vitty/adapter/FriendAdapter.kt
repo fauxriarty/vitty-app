@@ -83,14 +83,13 @@ class FriendAdapter(private val dataSet: List<UserResponse>) :
 
         holder.itemView.apply {
             setOnClickListener {
-                //navigate to ScheduleFragment
-                vibrateOnClick(context)
                 val bundle = Bundle()
                 bundle.putString("username", item.username)
                 bundle.putString("name", item.name)
                 bundle.putString("profile_picture", item.picture)
+                bundle.putString("friend_status", item.friend_status)
 
-                findNavController().navigate(R.id.action_navigation_community_to_navigation_schedule, bundle)
+                findNavController().navigate(R.id.action_navigation_community_to_friendFragment, bundle)
             }
 
         }

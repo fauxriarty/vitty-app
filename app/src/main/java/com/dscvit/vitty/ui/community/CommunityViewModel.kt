@@ -92,8 +92,8 @@ class CommunityViewModel : ViewModel() {
             })
     }
 
-    fun acceptRequest(token: String, userResponse: UserResponse) {
-        APICommunityRestClient.instance.acceptRequest(token,userResponse.username,
+    fun acceptRequest(token: String, username: String) {
+        APICommunityRestClient.instance.acceptRequest(token,username,
             object: RetrofitUserActionListener{
                 override fun onSuccess(call: Call<PostResponse>?, response: PostResponse?) {
                     Timber.d("AcceptRequest: $response")
@@ -106,8 +106,8 @@ class CommunityViewModel : ViewModel() {
             })
     }
 
-    fun rejectRequest(token:String, userResponse: UserResponse) {
-        APICommunityRestClient.instance.rejectRequest(token,userResponse.username,
+    fun rejectRequest(token:String, username: String) {
+        APICommunityRestClient.instance.rejectRequest(token,username,
             object: RetrofitUserActionListener{
                 override fun onSuccess(call: Call<PostResponse>?, response: PostResponse?) {
                     Timber.d("RejectRequest: $response")
@@ -120,8 +120,8 @@ class CommunityViewModel : ViewModel() {
             })
     }
 
-    fun sendRequest(token:String,userResponse: UserResponse) {
-        APICommunityRestClient.instance.sendRequest(token,userResponse.username,
+    fun sendRequest(token:String,username: String) {
+        APICommunityRestClient.instance.sendRequest(token,username,
             object: RetrofitUserActionListener{
                 override fun onSuccess(call: Call<PostResponse>?, response: PostResponse?) {
                     Timber.d("SendRequest: $response")
@@ -130,6 +130,20 @@ class CommunityViewModel : ViewModel() {
 
                 override fun onError(call: Call<PostResponse>?, t: Throwable?) {
                     Timber.d("SendRequest: ${t?.message}")
+                }
+            })
+    }
+
+    fun unfriend(token: String, username: String){
+        APICommunityRestClient.instance.unfriend(token,username,
+            object: RetrofitUserActionListener{
+                override fun onSuccess(call: Call<PostResponse>?, response: PostResponse?) {
+                    Timber.d("Unfriend: $response")
+                    _actionResponse.postValue(response)
+                }
+
+                override fun onError(call: Call<PostResponse>?, t: Throwable?) {
+                    Timber.d("Unfriend: ${t?.message}")
                 }
             })
     }

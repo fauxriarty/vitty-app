@@ -1,5 +1,6 @@
 package com.dscvit.vitty.adapter
 
+import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.LayoutInflater
@@ -7,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.adapters.ViewBindingAdapter.setOnLongClickListener
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.dscvit.vitty.R
@@ -25,7 +27,8 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
-class SearchAdapter(dataSet: List<UserResponse>, private val token:String, private val communityViewModel: CommunityViewModel) :
+class SearchAdapter(dataSet: List<UserResponse>, private val token:String, private val communityViewModel: CommunityViewModel,
+    private val isSearchMode: Boolean) :
     RecyclerView.Adapter<SearchAdapter.ViewHolder>() {
 
     val mutableDataSet = dataSet.toMutableList()
@@ -33,6 +36,7 @@ class SearchAdapter(dataSet: List<UserResponse>, private val token:String, priva
     class ViewHolder(private val binding: CardRequestBinding) :
         RecyclerView.ViewHolder(binding.root) {
         val name = binding.name
+        val actionLayout = binding.actionLayout
         val pendingRequestLayout = binding.acceptRejectLayout
         val sendRequestLayout = binding.sendRequestLayout
         val sentLayout = binding.sentLayout
@@ -60,6 +64,10 @@ class SearchAdapter(dataSet: List<UserResponse>, private val token:String, priva
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = mutableDataSet[holder.adapterPosition]
         holder.bind(item)
+
+        if(isSearchMode){
+            holder.actionLayout.visibility = View.GONE
+        }
         when (item.friend_status) {
             "received" -> {
                 holder.pendingRequestLayout.visibility = View.VISIBLE
@@ -87,7 +95,7 @@ class SearchAdapter(dataSet: List<UserResponse>, private val token:String, priva
 
         holder.accept.apply {
             setOnClickListener {
-                communityViewModel.acceptRequest(token,item)
+                communityViewModel.acceptRequest(token,item.username)
                 mutableDataSet.removeAt(holder.adapterPosition)
                 notifyItemRemoved(holder.adapterPosition)
                 notifyItemRangeChanged(holder.adapterPosition, mutableDataSet.size)
@@ -96,7 +104,7 @@ class SearchAdapter(dataSet: List<UserResponse>, private val token:String, priva
 
         holder.reject.apply {
             setOnClickListener {
-                communityViewModel.rejectRequest(token, item)
+                communityViewModel.rejectRequest(token, item.username)
                 mutableDataSet.removeAt(holder.adapterPosition)
                 notifyItemRemoved(holder.adapterPosition)
                 notifyItemRangeChanged(holder.adapterPosition, mutableDataSet.size)
@@ -107,14 +115,31 @@ class SearchAdapter(dataSet: List<UserResponse>, private val token:String, priva
             setOnClickListener {
                 holder.sendRequestLayout.visibility = View.GONE
                 holder.sentLayout.visibility = View.VISIBLE
-                communityViewModel.sendRequest(token,item)
+                communityViewModel.sendRequest(token,item.username)
             }
         }
 
 
+
         holder.itemView.apply {
             setOnClickListener {
+                val bundle = Bundle()
+                bundle.putString("username", item.username)
+                bundle.putString("name", item.name)
+                bundle.putString("profile_picture", item.picture)
+                bundle.putString("friend_status", item.friend_status)
 
+                if(isSearchMode) {
+                    findNavController().navigate(
+                        R.id.action_searchFragment_to_friendFragment,
+                        bundle
+                    )
+                }else{
+                    findNavController().navigate(
+                        R.id.action_navigation_requests_to_friendFragment,
+                        bundle
+                    )
+                }
             }
 
         }
