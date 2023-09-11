@@ -58,16 +58,18 @@ class FriendFragment : Fragment() {
     private fun setUpPage(name:String?, username:String?, picture:String?, friendStatus:String?) {
 
         binding.friendTimetableName.text = name ?: "Friend"
-        binding.friendTimetableUsername.text = username ?: "username"
+        binding.friendToolbar.title = username ?: "username"
         binding.profileImage.load(picture) {
             crossfade(true)
             placeholder(R.drawable.ic_gdscvit)
             error(R.drawable.ic_gdscvit)
         }
 
-        binding.back.setOnClickListener {
+        binding.friendToolbar.setNavigationIcon(R.drawable.ic_back)
+        binding.friendToolbar.setNavigationOnClickListener {
             requireActivity().onBackPressedDispatcher.onBackPressed()
         }
+
 
         setUpWithStatus(username, friendStatus)
 

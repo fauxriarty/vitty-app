@@ -37,17 +37,11 @@ class AllRequestFragment : Fragment() {
         if(token != null){
             communityViewModel.getFriendRequest(token)
         }
-        binding.reqToolbar.setOnMenuItemClickListener { menuItem ->
-            when (menuItem.itemId) {
-                R.id.close -> {
-                    requireActivity().onBackPressedDispatcher.onBackPressed()
-                    true
-                }
-                else -> {
-                    false
-                }
-            }
+        binding.reqToolbar.setNavigationIcon(R.drawable.ic_back)
+        binding.reqToolbar.setNavigationOnClickListener {
+            requireActivity().onBackPressedDispatcher.onBackPressed()
         }
+
 
         communityViewModel.friendRequest.observe(viewLifecycleOwner) {
             updateViewVisibility(binding.noRequests, it,)

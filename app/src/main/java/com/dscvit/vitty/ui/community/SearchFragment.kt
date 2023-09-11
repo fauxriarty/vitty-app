@@ -36,17 +36,11 @@ class SearchFragment : Fragment() {
         //get token from shared prefs
         val sharedPreferences = activity?.getSharedPreferences(Constants.USER_INFO, Context.MODE_PRIVATE)
         val token = sharedPreferences?.getString(Constants.COMMUNITY_TOKEN, null)
-        binding.searchToolbar.setOnMenuItemClickListener { menuItem ->
-            when (menuItem.itemId) {
-                R.id.close -> {
-                    requireActivity().onBackPressedDispatcher.onBackPressed()
-                    true
-                }
-                else -> {
-                    false
-                }
-            }
+        binding.searchToolbar.setNavigationIcon(R.drawable.ic_back)
+        binding.searchToolbar.setNavigationOnClickListener {
+            requireActivity().onBackPressedDispatcher.onBackPressed()
         }
+
 
         handleKeyboardAndNavigation(token)
 

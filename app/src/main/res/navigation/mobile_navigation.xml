@@ -17,9 +17,13 @@
         tools:layout="@layout/fragment_community" >
         <action
             android:id="@+id/action_navigation_community_to_navigation_requests"
+            app:enterAnim="@anim/slide_in_right"
+            app:popExitAnim="@anim/slide_out_right"
             app:destination="@id/navigation_requests" />
         <action
             android:id="@+id/action_navigation_community_to_friendFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:popExitAnim="@anim/slide_out_right"
             app:destination="@id/friendFragment" />
     </fragment>
     <fragment
@@ -29,12 +33,18 @@
         tools:layout="@layout/fragment_requests" >
         <action
             android:id="@+id/action_navigation_requests_to_searchFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:popExitAnim="@anim/slide_out_right"
             app:destination="@id/searchFragment" />
         <action
             android:id="@+id/action_navigation_requests_to_friendFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:popExitAnim="@anim/slide_out_right"
             app:destination="@id/friendFragment" />
         <action
             android:id="@+id/action_navigation_requests_to_allRequestFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:popExitAnim="@anim/slide_out_right"
             app:destination="@id/allRequestFragment" />
     </fragment>
     <fragment
@@ -44,6 +54,8 @@
         tools:layout="@layout/fragment_search" >
         <action
             android:id="@+id/action_searchFragment_to_friendFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:popExitAnim="@anim/slide_out_right"
             app:destination="@id/friendFragment" />
     </fragment>
     <fragment
@@ -58,6 +70,8 @@
         tools:layout="@layout/fragment_all_request" >
         <action
             android:id="@+id/action_allRequestFragment_to_friendFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:popExitAnim="@anim/slide_out_right"
             app:destination="@id/friendFragment" />
     </fragment>
 </navigation>

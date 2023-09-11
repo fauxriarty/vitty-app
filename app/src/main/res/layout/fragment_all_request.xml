@@ -23,7 +23,6 @@
                 android:paddingTop="12dp"
                 android:paddingEnd="10dp"
                 android:paddingBottom="10dp"
-                app:menu="@menu/requests_menu"
                 app:title="All Requests"
                 app:titleTextAppearance="@style/TitleTextAppearance"
                 app:titleTextColor="@color/white" />

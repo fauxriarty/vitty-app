@@ -92,6 +92,7 @@
             android:paddingStart="12dp"
             android:textSize="16dp"
             android:maxLines="1"
+            android:inputType="text"
             android:textCursorDrawable="@drawable/cursor_white"
             android:textColorHint="@color/translucent"/>
 
@@ -115,6 +116,7 @@
             android:paddingStart="12dp"
             android:textSize="16dp"
             android:maxLines="1"
+            android:inputType="text"
             android:textCursorDrawable="@drawable/cursor_white"
             android:textColorHint="@color/translucent"/>
 

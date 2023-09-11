@@ -23,7 +23,6 @@
                 android:paddingTop="12dp"
                 android:paddingEnd="10dp"
                 android:paddingBottom="10dp"
-                app:menu="@menu/requests_menu"
                 app:title="Search Friends"
                 app:titleTextAppearance="@style/TitleTextAppearance"
                 app:titleTextColor="@color/white" />
@@ -49,6 +48,7 @@
             android:layout_below="@id/search_friends_text_view"
             android:layout_marginHorizontal="20dp"
             android:hint="Username"
+            android:maxLength="20"
             android:shadowColor="@color/translucent"
             android:textColorHint="@color/translucent"
             app:boxStrokeColor="@color/translucent"
@@ -61,6 +61,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:maxLines="1"
+                android:inputType="text"
                 android:textCursorDrawable="@drawable/cursor_white"
                 android:textColor="@color/white" />
 

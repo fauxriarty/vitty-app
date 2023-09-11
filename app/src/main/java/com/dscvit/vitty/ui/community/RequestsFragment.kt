@@ -6,7 +6,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -50,18 +52,11 @@ class RequestsFragment : Fragment() {
         val requestLayout = binding.requestLayout
         val suggestedList = binding.suggestedList
 
-
-        binding.scheduleToolbar.setOnMenuItemClickListener { menuItem ->
-            when (menuItem.itemId) {
-                R.id.close -> {
-                    requireActivity().onBackPressedDispatcher.onBackPressed()
-                    true
-                }
-                else -> {
-                    false
-                }
-            }
+        binding.scheduleToolbar.setNavigationIcon(R.drawable.ic_back)
+        binding.scheduleToolbar.setNavigationOnClickListener {
+            requireActivity().onBackPressedDispatcher.onBackPressed()
         }
+
 
         binding.searchFriendsText.setCompoundDrawablesWithIntrinsicBounds(
             R.drawable.ic_search,
