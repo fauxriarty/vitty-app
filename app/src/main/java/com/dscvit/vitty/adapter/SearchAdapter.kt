@@ -6,6 +6,10 @@ import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.TextView
+import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.adapters.ViewBindingAdapter.setOnLongClickListener
 import androidx.navigation.findNavController
@@ -22,6 +26,7 @@ import com.dscvit.vitty.util.Effects.vibrateOnClick
 import com.dscvit.vitty.util.RemoteConfigUtils
 import com.dscvit.vitty.util.UtilFunctions.copyItem
 import com.dscvit.vitty.util.VITMap
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -104,10 +109,44 @@ class SearchAdapter(dataSet: List<UserResponse>, private val token:String, priva
 
         holder.reject.apply {
             setOnClickListener {
-                communityViewModel.rejectRequest(token, item.username)
-                mutableDataSet.removeAt(holder.adapterPosition)
-                notifyItemRemoved(holder.adapterPosition)
-                notifyItemRangeChanged(holder.adapterPosition, mutableDataSet.size)
+
+                val v: View = LayoutInflater
+                    .from(context)
+                    .inflate(R.layout.dialog_setup_complete, null)
+                val dialog =MaterialAlertDialogBuilder(context)
+                    .setView(v)
+                    .setBackground(
+                        AppCompatResources.getDrawable(
+                            context,
+                            R.color.transparent
+                        )
+                    )
+                    .create()
+                dialog.setCanceledOnTouchOutside(true)
+                dialog.show()
+
+                val skip = v.findViewById<Button>(R.id.skip)
+                val next = v.findViewById<Button>(R.id.next)
+                val title = v.findViewById<TextView>(R.id.title)
+                val desc = v.findViewById<TextView>(R.id.description)
+
+                title.text = "Reject Request"
+                desc.text = "Are you sure you want to reject this request?"
+                skip.text = "Cancel"
+                next.text = "Reject"
+
+                skip.setOnClickListener {
+                    dialog.dismiss()
+                }
+
+                next.setOnClickListener {
+                    communityViewModel.rejectRequest(token, item.username)
+                    mutableDataSet.removeAt(holder.adapterPosition)
+                    notifyItemRemoved(holder.adapterPosition)
+                    notifyItemRangeChanged(holder.adapterPosition, mutableDataSet.size)
+                    dialog.dismiss()
+                }
+
             }
         }
 
@@ -153,4 +192,6 @@ class SearchAdapter(dataSet: List<UserResponse>, private val token:String, priva
     }
 
     override fun getItemCount() = mutableDataSet.size
+
 }
+

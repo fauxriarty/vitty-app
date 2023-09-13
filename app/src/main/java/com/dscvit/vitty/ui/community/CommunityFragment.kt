@@ -16,6 +16,7 @@ import com.dscvit.vitty.adapter.FriendAdapter
 import com.dscvit.vitty.adapter.PeriodAdapter
 import com.dscvit.vitty.adapter.PinnedFriendAdapterListener
 import com.dscvit.vitty.databinding.FragmentCommunityBinding
+import com.dscvit.vitty.network.api.community.responses.user.FriendResponse
 import com.dscvit.vitty.util.Constants
 import com.dscvit.vitty.util.Quote
 import timber.log.Timber
@@ -40,14 +41,13 @@ class CommunityFragment : Fragment(), PinnedFriendAdapterListener{
 
         _binding = FragmentCommunityBinding.inflate(inflater, container, false)
         val root: View = binding.root
-
+        binding.loadingView.visibility = View.VISIBLE
         //get token and username from shared preferences
         sharedPreferences = requireActivity().getSharedPreferences(Constants.USER_INFO, Context.MODE_PRIVATE)
         val token = sharedPreferences.getString(Constants.COMMUNITY_TOKEN, "") ?: ""
         val username = sharedPreferences.getString(Constants.COMMUNITY_USERNAME, "") ?: ""
         Timber.d("TokenComm: $token")
         communityViewModel.getFriendList(token, username)
-        getData()
         binding.communityToolbar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.requests -> {
@@ -61,12 +61,15 @@ class CommunityFragment : Fragment(), PinnedFriendAdapterListener{
             }
         }
 
+        getData()
+
 
         return root
     }
 
     private fun getData() {
         communityViewModel.friendList.observe(viewLifecycleOwner) {
+            updatePins(it)
             if (it != null) {
                 val allFriends = it.data
                 binding.apply {
@@ -76,6 +79,7 @@ class CommunityFragment : Fragment(), PinnedFriendAdapterListener{
                         friendsList.adapter = friendAdapter
                         friendsList.layoutManager = LinearLayoutManager(context)
                         noFriends.visibility = View.INVISIBLE
+                        binding.loadingView.visibility = View.GONE
                     } else {
                         /*binding.quoteLine.text = try {
                             Quote.getLine(context)
@@ -83,7 +87,22 @@ class CommunityFragment : Fragment(), PinnedFriendAdapterListener{
                             Constants.DEFAULT_QUOTE
                         }*/
                         noFriends.visibility = View.VISIBLE
+                        binding.loadingView.visibility = View.GONE
                     }
+                }
+            }else{
+                binding.loadingView.visibility = View.GONE
+            }
+        }
+    }
+
+    private fun updatePins(it: FriendResponse?) {
+        if(it != null){
+            val pinnedFriends = getPinnedFriends()
+            val allFriendsUsernames = it.data?.map { it.username }
+            for(i in pinnedFriends){
+                if(!allFriendsUsernames.isNullOrEmpty() && !allFriendsUsernames.contains(i)){
+                    unPinFriend(i)
                 }
             }
         }

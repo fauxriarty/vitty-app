@@ -56,6 +56,7 @@ class DayFragment : Fragment() {
             container,
             false
         )
+        binding.loadingView.visibility = View.VISIBLE
         scheduleViewModel = ViewModelProvider(this)[ScheduleViewModel::class.java]
         //get token and username from shared preferences
         val sharedPreferences = activity?.getSharedPreferences(USER_INFO, Context.MODE_PRIVATE)
@@ -116,6 +117,9 @@ class DayFragment : Fragment() {
 
                 }
 
+            }else{
+                Toast.makeText(context, "Error fetching timetable", Toast.LENGTH_SHORT).show()
+                binding.loadingView.visibility = View.GONE
             }
         }
         /*if (uid != null) {
@@ -206,6 +210,7 @@ class DayFragment : Fragment() {
                 dayList.adapter = PeriodAdapter(courseList, fragID)
                 dayList.layoutManager = LinearLayoutManager(context)
                 noPeriod.visibility = View.INVISIBLE
+                binding.loadingView.visibility = View.GONE
             } else {
                 binding.quoteLine.text = try {
                     Quote.getLine(context)
@@ -213,6 +218,7 @@ class DayFragment : Fragment() {
                     DEFAULT_QUOTE
                 }
                 noPeriod.visibility = View.VISIBLE
+                binding.loadingView.visibility = View.GONE
             }
         }
     }

@@ -137,8 +137,8 @@ class FriendFragment : Fragment() {
             friendLayout(username)
         }
         binding.reject.setOnClickListener {
-            rejectRequest(username)
-            sendRequestLayout()
+            handleRejectAction(username)
+
         }
         binding.sendRequest.setOnClickListener {
             sendRequest(username)
@@ -149,6 +149,44 @@ class FriendFragment : Fragment() {
 
         }
 
+    }
+
+    private fun handleRejectAction(username: String) {
+
+        val v: View = LayoutInflater
+            .from(context)
+            .inflate(R.layout.dialog_setup_complete, null)
+        val dialog = MaterialAlertDialogBuilder(requireContext())
+            .setView(v)
+            .setBackground(
+                AppCompatResources.getDrawable(
+                    requireContext(),
+                    R.color.transparent
+                )
+            )
+            .create()
+        dialog.setCanceledOnTouchOutside(true)
+        dialog.show()
+
+        val skip = v.findViewById<Button>(R.id.skip)
+        val next = v.findViewById<Button>(R.id.next)
+        val title = v.findViewById<TextView>(R.id.title)
+        val desc = v.findViewById<TextView>(R.id.description)
+
+        title.text = "Reject Request"
+        desc.text = "Are you sure you want to reject this request?"
+        skip.text = "Cancel"
+        next.text = "Reject"
+
+        skip.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        next.setOnClickListener {
+            rejectRequest(username)
+            sendRequestLayout()
+            dialog.dismiss()
+        }
     }
 
     private fun handleUnfriendAction(username: String) {

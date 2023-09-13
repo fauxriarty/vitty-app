@@ -22,6 +22,8 @@ class AllRequestFragment : Fragment() {
 
     private lateinit var binding: FragmentAllRequestBinding
     private lateinit var prefs: SharedPreferences
+    private lateinit var communityViewModel: CommunityViewModel
+    private lateinit var searchAdapter: SearchAdapter
 
 
     override fun onCreateView(
@@ -29,7 +31,7 @@ class AllRequestFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentAllRequestBinding.inflate(inflater, container, false)
-        val communityViewModel = ViewModelProvider(this)[CommunityViewModel::class.java]
+        communityViewModel = ViewModelProvider(this)[CommunityViewModel::class.java]
         val requestList = binding.requestList
 
         prefs = requireContext().getSharedPreferences(Constants.USER_INFO, 0)
@@ -46,20 +48,23 @@ class AllRequestFragment : Fragment() {
         communityViewModel.friendRequest.observe(viewLifecycleOwner) {
             updateViewVisibility(binding.noRequests, it,)
             Timber.d("FriendRequestList--: $it")
-            if (it != null) {
+        if (it != null && token != null && it.isNotEmpty()) {
                 val requestListParsed = getRequestList(it)
                 if(requestListParsed.isNotEmpty()) {
                     requestList.visibility = View.VISIBLE
                     requestList.scheduleLayoutAnimation()
-                    requestList.adapter =
-                        token?.let { token ->
-                            SearchAdapter(requestListParsed,
-                                token, communityViewModel, false, true)
-                        }
+                    searchAdapter = SearchAdapter(requestListParsed,
+                        token, communityViewModel, isSearchMode = false, isAllReqPage = true
+                    )
+                    requestList.adapter = searchAdapter
+
                     requestList.layoutManager = LinearLayoutManager(context)
                 }
 
-            }
+            }else{
+                requestList.visibility = View.GONE
+                binding.noRequests.visibility = View.VISIBLE
+        }
         }
 
         communityViewModel.actionResponse.observe(viewLifecycleOwner){
