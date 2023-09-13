@@ -79,6 +79,13 @@
                 android:paddingHorizontal="16dp"
                 android:paddingVertical="10dp">
 
+                <ImageView
+                    android:id="@+id/pin"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    android:rotation="45"
+                    android:src="@drawable/ic_pin"/>
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

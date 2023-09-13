@@ -1,5 +1,6 @@
 package com.dscvit.vitty.adapter
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -19,21 +20,24 @@ import com.dscvit.vitty.util.Effects.vibrateOnClick
 import com.dscvit.vitty.util.RemoteConfigUtils
 import com.dscvit.vitty.util.UtilFunctions.copyItem
 import com.dscvit.vitty.util.VITMap
+import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
-class FriendAdapter(private val dataSet: List<UserResponse>) :
+class FriendAdapter(dataList: List<UserResponse>, private val pinnedFriendAdapterListener: PinnedFriendAdapterListener) :
     RecyclerView.Adapter<FriendAdapter.ViewHolder>() {
 
 
+    private val dataSet = pinFriendsOnTop(dataList).toMutableList()
     class ViewHolder(private val binding: CardFriendBinding) :
         RecyclerView.ViewHolder(binding.root) {
         val friend_name = binding.friendName
         val friend_class = binding.friendClass
         val friend_status = binding.friendStatus
         val friend_image = binding.icon
+        val pin = binding.pin
 
         fun bind(data: UserResponse) {
             binding.friendDetails = data
@@ -55,6 +59,7 @@ class FriendAdapter(private val dataSet: List<UserResponse>) :
         val item = dataSet[holder.adapterPosition]
         holder.bind(item)
 
+
        /* val startTime: Date = item.startTime.toDate()
         val simpleDateFormat = SimpleDateFormat("h:mm a", Locale.getDefault())
         val sTime: String = simpleDateFormat.format(startTime).uppercase(Locale.ROOT)
@@ -74,6 +79,12 @@ class FriendAdapter(private val dataSet: List<UserResponse>) :
         end[Calendar.HOUR_OF_DAY] = e[Calendar.HOUR_OF_DAY]
         end[Calendar.MINUTE] = e[Calendar.MINUTE]*/
 
+        val pinnedFriends = pinnedFriendAdapterListener.getPinnedFriends()
+        if(pinnedFriends.contains(item.username)){
+            holder.pin.visibility = View.VISIBLE
+        }else{
+            holder.pin.visibility = View.GONE
+        }
 
         holder.friend_image.load(item.picture) {
             crossfade(true)
@@ -91,11 +102,63 @@ class FriendAdapter(private val dataSet: List<UserResponse>) :
 
                 findNavController().navigate(R.id.action_navigation_community_to_friendFragment, bundle)
             }
+        }
 
+        holder.itemView.apply {
+            setOnLongClickListener {
+                vibrateOnClick(context)
+                val updatedPinnedFriends = pinnedFriendAdapterListener.getPinnedFriends()
+                if(updatedPinnedFriends.contains(item.username)){
+                    if(pinnedFriendAdapterListener.unPinFriend(item.username)){
+                        holder.pin.visibility = View.GONE
+                        notifyItemMoved(holder.adapterPosition, pinnedFriendAdapterListener.getPinnedFriends().size)
+                        Timber.d("Pinned Friends: ${pinnedFriendAdapterListener.getPinnedFriends()}")
+                    }
+                }else{
+                    if(pinnedFriendAdapterListener.pinFriend(item.username)){
+                        holder.pin.visibility = View.VISIBLE
+                        notifyItemMoved(holder.adapterPosition, updatedPinnedFriends.size )
+                        Timber.d("Pinned Friends: ${pinnedFriendAdapterListener.getPinnedFriends()}")
+                    }
+
+                }
+                true
+            }
         }
 
 
     }
 
     override fun getItemCount() = dataSet.size
+
+    private fun pinFriendsOnTop(dataSet: List<UserResponse>) : List<UserResponse> {
+        val pinnedFriends = pinnedFriendAdapterListener.getPinnedFriends()
+        val pinnedFriendsList = mutableListOf<UserResponse>()
+        val otherFriendsList = mutableListOf<UserResponse>()
+        for(i in pinnedFriends){
+            for(j in dataSet){
+                if(i == j.username){
+                    pinnedFriendsList.add(j)
+                    continue
+                }
+            }
+        }
+        for (i in dataSet){
+            if(!pinnedFriends.contains(i.username)){
+                pinnedFriendsList.add(i)
+            }
+        }
+
+        return pinnedFriendsList + otherFriendsList
+    }
+}
+
+
+
+interface PinnedFriendAdapterListener {
+    fun pinFriend(username: String): Boolean
+    
+    fun unPinFriend(username: String): Boolean
+
+    fun getPinnedFriends(): List<String>
 }
