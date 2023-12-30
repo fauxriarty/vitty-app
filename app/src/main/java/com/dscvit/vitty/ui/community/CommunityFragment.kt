@@ -174,13 +174,24 @@ class CommunityFragment : Fragment(), PinnedFriendAdapterListener{
         val friend3New = sharedPreferences.getString(Constants.COMMUNITY_PINNED_FRIEND_3, null)
         if(friend1New == null && friend2New != null){
             sharedPreferences.edit().putString(Constants.COMMUNITY_PINNED_FRIEND_1, friend2New).apply()
-            sharedPreferences.edit().putString(Constants.COMMUNITY_PINNED_FRIEND_2, null).apply()
+            if(friend3!=null){
+                sharedPreferences.edit().putString(Constants.COMMUNITY_PINNED_FRIEND_2, friend3).apply()
+                sharedPreferences.edit().putString(Constants.COMMUNITY_PINNED_FRIEND_3, null).apply()
+            }else{
+                sharedPreferences.edit().putString(Constants.COMMUNITY_PINNED_FRIEND_2, null).apply()
+            }
+
         }
         if(friend2New == null && friend3New != null){
             sharedPreferences.edit().putString(Constants.COMMUNITY_PINNED_FRIEND_2, friend3New).apply()
             sharedPreferences.edit().putString(Constants.COMMUNITY_PINNED_FRIEND_3, null).apply()
         }
 
+        val friend1Newt = sharedPreferences.getString(Constants.COMMUNITY_PINNED_FRIEND_1, null)
+        val friend2Newt = sharedPreferences.getString(Constants.COMMUNITY_PINNED_FRIEND_2, null)
+        val friend3Newt = sharedPreferences.getString(Constants.COMMUNITY_PINNED_FRIEND_3, null)
+
+        Timber.d("sorted after unpin $friend1Newt $friend2Newt $friend3Newt")
         Toast.makeText(context, "Unpinned $username", Toast.LENGTH_SHORT).show()
         return true
     }
