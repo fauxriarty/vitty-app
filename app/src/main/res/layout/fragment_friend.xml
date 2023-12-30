@@ -11,6 +11,7 @@
         android:id="@+id/schedule_appbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:visibility="gone"
         android:background="@color/background">
 
         <com.google.android.material.appbar.MaterialToolbar
@@ -27,13 +28,6 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-
-    <androidx.core.widget.NestedScrollView
-        android:id="@+id/scroll"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        android:fillViewport="true">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -212,9 +206,6 @@
 
 
     </RelativeLayout>
-
-    </androidx.core.widget.NestedScrollView>
-
     <RelativeLayout
         android:id="@+id/not_friend"
         android:layout_width="match_parent"
