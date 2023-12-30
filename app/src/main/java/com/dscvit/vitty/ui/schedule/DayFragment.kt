@@ -166,6 +166,8 @@ class DayFragment : Fragment() {
                 )
                 courseList.add(pd)
             }
+            courseList.sortBy { it.startTime }
+
         }
         scheduleSetup()
 
@@ -177,13 +179,12 @@ class DayFragment : Fragment() {
             val time = replaceYearIfZero(timeString)
             val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
             // Set the time zone of the date format to UTC
-            dateFormat.timeZone = TimeZone.getTimeZone("UTC")
             val date = dateFormat.parse(time)
             Timber.d("Date----: $date")
 
             if (date != null) {
                 val localTimeZone = TimeZone.getDefault()
-                val localDate = Date(date.time + localTimeZone.rawOffset)
+                val localDate = Date(date.time)
                 return Timestamp(localDate)
             }else{
                 return Timestamp.now()
