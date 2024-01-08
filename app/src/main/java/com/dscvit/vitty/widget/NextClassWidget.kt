@@ -11,6 +11,9 @@ import com.dscvit.vitty.R
 import com.dscvit.vitty.activity.AuthActivity
 import com.dscvit.vitty.activity.NavigationActivity
 import com.dscvit.vitty.model.PeriodDetails
+import com.dscvit.vitty.network.api.community.APICommunityRestClient
+import com.dscvit.vitty.network.api.community.RetrofitSelfUserListener
+import com.dscvit.vitty.network.api.community.responses.user.UserResponse
 import com.dscvit.vitty.util.Constants
 import com.dscvit.vitty.util.Constants.NEXT_CLASS_INTENT
 import com.dscvit.vitty.util.Constants.NEXT_CLASS_NAV_INTENT
@@ -21,6 +24,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Source
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.runBlocking
+import retrofit2.Call
 import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -195,61 +199,153 @@ suspend fun fetchData(
             .toString() else oldDay
         val uid = sharedPref.getString("uid", "")
         var pd = PeriodDetails()
-        if (uid != null && uid != "") {
-            db.collection("users")
-                .document(uid)
-                .collection("timetable")
-                .document(day)
-                .collection("periods")
-                .get(Source.CACHE)
-                .addOnSuccessListener { result ->
-                    for (document in result) {
-                        try {
-                            val start = Calendar.getInstance()
-                            val s = Calendar.getInstance()
-                            s.time = document.getTimestamp("startTime")!!.toDate()
-                            start[Calendar.HOUR_OF_DAY] = s[Calendar.HOUR_OF_DAY]
-                            start[Calendar.MINUTE] = s[Calendar.MINUTE]
-                            Timber.d("$calendar")
-                            Timber.d("$start")
-                            if (start.time > calendar.time) {
-                                val end = Calendar.getInstance()
-                                val e = Calendar.getInstance()
-                                e.time = document.getTimestamp("endTime")!!.toDate()
-                                end[Calendar.HOUR_OF_DAY] = e[Calendar.HOUR_OF_DAY]
-                                end[Calendar.MINUTE] = e[Calendar.MINUTE]
-                                Timber.d("$end")
-                                if (end.time > calendar.time) {
-                                    pd = PeriodDetails(
-                                        document.getString("courseCode")!!,
-                                        document.getString("courseName")!!,
-                                        document.getTimestamp("startTime")!!,
-                                        document.getTimestamp("endTime")!!,
-                                        document.getString("slot")!!,
-                                        document.getString("location")!!
-                                    )
-                                    break
-                                }
-                            } else {
-                                pd.courseName = ""
-                                val simpleDateFormat =
-                                    SimpleDateFormat("h:mm a", Locale.getDefault())
-                                val sTime: String =
-                                    simpleDateFormat.format(calendar.time).uppercase(Locale.ROOT)
-                                Timber.d("LOL: $sTime")
-                            }
-                        } catch (e: Exception) {
+        val sharedPreferences = context.getSharedPreferences(Constants.USER_INFO, Context.MODE_PRIVATE)
+        val token = sharedPreferences?.getString(Constants.COMMUNITY_TOKEN, "") ?: ""
+        val username =  sharedPreferences?.getString(Constants.COMMUNITY_USERNAME, null) ?: ""
+            APICommunityRestClient.instance.getUserWithTimeTable(token, username,
+
+                object : RetrofitSelfUserListener {
+                    override fun onSuccess(call: Call<UserResponse>?, response: UserResponse?) {
+                        val user = response
+                        if(user?.timetable?.data == null){
                             pd.courseName = ""
-                            Timber.d("F: $e")
+                            updateNextClassWidget(context, appWidgetManager, appWidgetId, pd)
+                            return
                         }
+                        var today = user.timetable?.data?.Monday
+
+                        when(day){
+                            "monday" -> {
+                                today = user.timetable?.data?.Monday
+                            }
+                            "tuesday" -> {
+                                today = user.timetable?.data?.Tuesday
+                            }
+                            "wednesday" -> {
+                                today = user.timetable?.data?.Wednesday
+                            }
+                            "thursday" -> {
+                                today = user.timetable?.data?.Thursday
+                            }
+                            "friday" -> {
+                                today = user?.timetable?.data?.Friday
+                            }
+                            "saturday" -> {
+                                today = user?.timetable?.data?.Saturday
+                            }
+                            "sunday" -> {
+                                today = user?.timetable?.data?.Sunday
+                            }
+                        }
+                        today = today?.sortedBy { it.start_time }
+                        for(period in today!!){
+
+                            try {
+                                val start = Calendar.getInstance()
+                                val s = Calendar.getInstance()
+                                s.time = parseTimeToTimestamp(period.start_time).toDate()
+                                start[Calendar.HOUR_OF_DAY] = s[Calendar.HOUR_OF_DAY]
+                                start[Calendar.MINUTE] = s[Calendar.MINUTE]
+                                Timber.d("$calendar")
+                                Timber.d("$start")
+                                if (start.time > calendar.time) {
+                                    val end = Calendar.getInstance()
+                                    val e = Calendar.getInstance()
+                                    e.time =  parseTimeToTimestamp(period.end_time).toDate()
+                                    end[Calendar.HOUR_OF_DAY] = e[Calendar.HOUR_OF_DAY]
+                                    end[Calendar.MINUTE] = e[Calendar.MINUTE]
+                                    Timber.d("$end")
+                                    if (end.time > calendar.time) {
+                                        pd = PeriodDetails(
+                                            period.code,
+                                            period.name,
+                                            parseTimeToTimestamp(period.start_time),
+                                            parseTimeToTimestamp(period.end_time),
+                                            period.slot,
+                                            period.venue
+                                        )
+                                        break
+                                    }
+                                } else {
+                                    pd.courseName = ""
+                                    val simpleDateFormat =
+                                        SimpleDateFormat("h:mm a", Locale.getDefault())
+                                    val sTime: String =
+                                        simpleDateFormat.format(calendar.time).uppercase(Locale.ROOT)
+                                    Timber.d("LOL: $sTime")
+                                }
+                            } catch (e: Exception) {
+                                pd.courseName = ""
+                                Timber.d("F: $e")
+                            }
+
+
+                        }
+                        updateNextClassWidget(context, appWidgetManager, appWidgetId, pd)
+
                     }
-                    updateNextClassWidget(context, appWidgetManager, appWidgetId, pd)
-                }
-                .addOnFailureListener { e ->
-                    Timber.d("Error: $e")
-                }
-        } else {
-            pd.courseName = ""
-            updateNextClassWidget(context, appWidgetManager, appWidgetId, pd)
-        }
+
+                    override fun onError(call: Call<UserResponse>?, t: Throwable?) {
+                        pd.courseName = ""
+                        updateNextClassWidget(context, appWidgetManager, appWidgetId, pd)
+                    }
+                })
+
+//        if (uid != null && uid != "") {
+//            db.collection("users")
+//                .document(uid)
+//                .collection("timetable")
+//                .document(day)
+//                .collection("periods")
+//                .get(Source.CACHE)
+//                .addOnSuccessListener { result ->
+//                    for (document in result) {
+//                        try {
+//                            val start = Calendar.getInstance()
+//                            val s = Calendar.getInstance()
+//                            s.time = document.getTimestamp("startTime")!!.toDate()
+//                            start[Calendar.HOUR_OF_DAY] = s[Calendar.HOUR_OF_DAY]
+//                            start[Calendar.MINUTE] = s[Calendar.MINUTE]
+//                            Timber.d("$calendar")
+//                            Timber.d("$start")
+//                            if (start.time > calendar.time) {
+//                                val end = Calendar.getInstance()
+//                                val e = Calendar.getInstance()
+//                                e.time = document.getTimestamp("endTime")!!.toDate()
+//                                end[Calendar.HOUR_OF_DAY] = e[Calendar.HOUR_OF_DAY]
+//                                end[Calendar.MINUTE] = e[Calendar.MINUTE]
+//                                Timber.d("$end")
+//                                if (end.time > calendar.time) {
+//                                    pd = PeriodDetails(
+//                                        document.getString("courseCode")!!,
+//                                        document.getString("courseName")!!,
+//                                        document.getTimestamp("startTime")!!,
+//                                        document.getTimestamp("endTime")!!,
+//                                        document.getString("slot")!!,
+//                                        document.getString("location")!!
+//                                    )
+//                                    break
+//                                }
+//                            } else {
+//                                pd.courseName = ""
+//                                val simpleDateFormat =
+//                                    SimpleDateFormat("h:mm a", Locale.getDefault())
+//                                val sTime: String =
+//                                    simpleDateFormat.format(calendar.time).uppercase(Locale.ROOT)
+//                                Timber.d("LOL: $sTime")
+//                            }
+//                        } catch (e: Exception) {
+//                            pd.courseName = ""
+//                            Timber.d("F: $e")
+//                        }
+//                    }
+//                    updateNextClassWidget(context, appWidgetManager, appWidgetId, pd)
+//                }
+//                .addOnFailureListener { e ->
+//                    Timber.d("Error: $e")
+//                }
+//        } else {
+//            pd.courseName = ""
+//            updateNextClassWidget(context, appWidgetManager, appWidgetId, pd)
+//        }
     }
