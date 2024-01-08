@@ -254,11 +254,11 @@ class ScheduleFragment : Fragment() {
     private fun introMessage(pos: Int): List<String> {
         return when (pos) {
             0 -> listOf(getString(R.string.congratulations), getString(R.string.complete_msg))
-            1 -> listOf(getString(R.string.widgets), getString(R.string.about_widgets))
-            2 -> listOf(getString(R.string.notifications), getString(R.string.about_notifications))
-            3 -> listOf(getString(R.string.battery), getString(R.string.about_battery))
-            4 -> listOf(getString(R.string.nav), getString(R.string.about_nav))
-            5 -> listOf(getString(R.string.new_updates), getString(R.string.about_new_updates))
+            1 ->  listOf(getString(R.string.new_updates), getString(R.string.about_new_updates))
+            2 -> listOf(getString(R.string.widgets), getString(R.string.about_widgets))
+            3 -> listOf(getString(R.string.notifications), getString(R.string.about_notifications))
+            4 -> listOf(getString(R.string.battery), getString(R.string.about_battery))
+            5 -> listOf(getString(R.string.nav), getString(R.string.about_nav))
             else -> listOf(getString(R.string.final_heading), getString(R.string.about_final))
         }
     }

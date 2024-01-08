@@ -107,11 +107,11 @@ class DayFragment : Fragment() {
                         setUpDayTimeTable(friday)
                     }
                     "saturday" -> {
-                        val saturday = null
+                        val saturday = timetableDays?.Saturday
                         setUpDayTimeTable(saturday)
                     }
                     "sunday" -> {
-                        val sunday = null
+                        val sunday = timetableDays?.Sunday
                         setUpDayTimeTable(sunday)
                     }
 
@@ -231,7 +231,7 @@ class DayFragment : Fragment() {
                 "saturday"
             ).toString()
         ) {
-            getData()
+              getData()
         }
     }
 }
