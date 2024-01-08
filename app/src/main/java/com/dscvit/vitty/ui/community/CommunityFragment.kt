@@ -16,7 +16,9 @@ import com.dscvit.vitty.adapter.FriendAdapter
 import com.dscvit.vitty.adapter.PeriodAdapter
 import com.dscvit.vitty.adapter.PinnedFriendAdapterListener
 import com.dscvit.vitty.databinding.FragmentCommunityBinding
+import com.dscvit.vitty.network.api.community.responses.requests.RequestsResponse
 import com.dscvit.vitty.network.api.community.responses.user.FriendResponse
+import com.dscvit.vitty.network.api.community.responses.user.UserResponse
 import com.dscvit.vitty.util.Constants
 import com.dscvit.vitty.util.Quote
 import timber.log.Timber
@@ -48,6 +50,7 @@ class CommunityFragment : Fragment(), PinnedFriendAdapterListener{
         val username = sharedPreferences.getString(Constants.COMMUNITY_USERNAME, "") ?: ""
         Timber.d("TokenComm: $token")
         communityViewModel.getFriendList(token, username)
+        communityViewModel.getFriendRequest(token)
         binding.communityToolbar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.requests -> {
@@ -61,12 +64,24 @@ class CommunityFragment : Fragment(), PinnedFriendAdapterListener{
             }
         }
 
+        binding.friendRequestsNotification.setOnClickListener {
+            requireView().findNavController()
+                .navigate(R.id.action_navigation_community_to_navigation_requests)
+        }
+
         getData()
 
 
         return root
     }
 
+
+    override fun onResume() {
+        super.onResume()
+
+        val token = sharedPreferences.getString(Constants.COMMUNITY_TOKEN, "") ?: ""
+        communityViewModel.getFriendRequest(token)
+    }
     private fun getData() {
         communityViewModel.friendList.observe(viewLifecycleOwner) {
             updatePins(it)
@@ -94,6 +109,35 @@ class CommunityFragment : Fragment(), PinnedFriendAdapterListener{
                 binding.loadingView.visibility = View.GONE
             }
         }
+
+        showFriendReqCount()
+    }
+
+    private fun showFriendReqCount() {
+        Timber.d("showFriendReqCount")
+        communityViewModel.friendRequest.observe(viewLifecycleOwner) {
+
+            Timber.d("showFriendReqCount it $it")
+            if (it != null) {
+                val allRequests = getRequestList(it)
+                binding.apply {
+                    if (!allRequests.isNullOrEmpty()) {
+                        friendRequestsNotification.visibility = View.VISIBLE
+                        friendRequestsNotification.text = "${allRequests.size} req"
+                    } else {
+                        friendRequestsNotification.visibility = View.GONE
+                    }
+                }
+            }
+        }
+    }
+
+    private fun getRequestList(it: RequestsResponse): List<UserResponse> {
+        val requestList = mutableListOf<UserResponse>()
+        for (i in it){
+            requestList.add(i.from)
+        }
+        return requestList
     }
 
     private fun updatePins(it: FriendResponse?) {

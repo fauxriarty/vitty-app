@@ -26,7 +26,24 @@
                 app:menu="@menu/community_menu"
                 app:title="@string/title_community"
                 app:titleTextAppearance="@style/TitleTextAppearance"
-                app:titleTextColor="@color/white" />
+                app:titleTextColor="@color/white" >
+
+                <TextView
+                    android:id="@+id/friend_requests_notification"
+                    android:layout_width="wrap_content"
+                    android:layout_height="24dp"
+                    android:layout_gravity="end|top"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:background="@drawable/bubble_bg"
+                    android:gravity="center"
+                    android:paddingStart="4dp"
+                    android:paddingEnd="4dp"
+                    android:visibility="invisible"
+                    android:textColor="@android:color/white"
+                    android:text="2 Req" />
+
+            </com.google.android.material.appbar.MaterialToolbar>
 
         </com.google.android.material.appbar.AppBarLayout>
 
