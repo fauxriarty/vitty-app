@@ -79,6 +79,15 @@ class FriendAdapter(dataList: List<UserResponse>, private val pinnedFriendAdapte
         end[Calendar.HOUR_OF_DAY] = e[Calendar.HOUR_OF_DAY]
         end[Calendar.MINUTE] = e[Calendar.MINUTE]*/
 
+        holder.friend_status.text = item.current_status?.venue ?: "Free"
+        val status = item.current_status?.status
+        val course = item.current_status?.`class`
+
+        holder.friend_class.text = if (status == null || status.lowercase() == "free" || status.lowercase() == "unknown") {
+            "Not in a class right now"
+        } else {
+            "$course"
+        }
         val pinnedFriends = pinnedFriendAdapterListener.getPinnedFriends()
         if(pinnedFriends.contains(item.username)){
             holder.pin.visibility = View.VISIBLE

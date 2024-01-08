@@ -5,5 +5,7 @@ data class Data(
     val Monday: List<Course>?,
     val Thursday: List<Course>?,
     val Tuesday: List<Course>?,
-    val Wednesday: List<Course>?
+    val Wednesday: List<Course>?,
+    val Saturday: List<Course>?,
+    val Sunday: List<Course>?
 )

@@ -1,5 +1,6 @@
 package com.dscvit.vitty.network.api.community.responses.user
 
+import com.dscvit.vitty.network.api.community.responses.timetable.CurrentStatus
 import com.dscvit.vitty.network.api.community.responses.timetable.TimetableResponse
 
 data class UserResponse(
@@ -10,5 +11,6 @@ data class UserResponse(
     var name: String,
     var picture: String,
     var timetable: TimetableResponse?,
-    var username: String
+    var username: String,
+    var current_status: CurrentStatus?
 )
