@@ -67,4 +67,18 @@ class AuthViewModel : ViewModel() {
             })
     }
 
+    fun getUserWithTimeTable(token: String, username: String) {
+        APICommunityRestClient.instance.getUserWithTimeTable(token, username,
+
+            object : RetrofitSelfUserListener {
+                override fun onSuccess(call: Call<UserResponse>?, response: UserResponse?) {
+                    _user.postValue(response)
+                }
+
+                override fun onError(call: Call<UserResponse>?, t: Throwable?) {
+                    _user.postValue(null)
+                }
+            })
+    }
+
 }

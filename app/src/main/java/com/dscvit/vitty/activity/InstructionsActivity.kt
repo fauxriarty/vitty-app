@@ -28,6 +28,7 @@ import com.dscvit.vitty.ui.auth.AuthViewModel
 import com.dscvit.vitty.ui.schedule.ScheduleViewModel
 import com.dscvit.vitty.util.ArraySaverLoader.loadArray
 import com.dscvit.vitty.util.ArraySaverLoader.saveArray
+import com.dscvit.vitty.util.Constants
 import com.dscvit.vitty.util.Constants.ALARM_INTENT
 import com.dscvit.vitty.util.Constants.EXAM_MODE
 import com.dscvit.vitty.util.Constants.GROUP_ID
@@ -68,7 +69,9 @@ class InstructionsActivity : AppCompatActivity() {
         setGDSCVITChannel()
 
         binding.doneButton.setOnClickListener {
-            setupDoneButton()
+            val token = prefs.getString(Constants.COMMUNITY_TOKEN, null)
+            val username = prefs.getString(Constants.COMMUNITY_USERNAME, null)
+            setupDoneButton(token, username)
         }
     }
 
@@ -87,14 +90,24 @@ class InstructionsActivity : AppCompatActivity() {
         }
     }
 
-    private fun setupDoneButton() {
+    private fun setupDoneButton(token: String?, username: String?) {
         binding.loadingView.visibility = View.VISIBLE
 
+        Timber.d("done button clicked")
+
+        if(token!=null && username!=null){
+            authViewModel.getUserWithTimeTable(token, username)
+        }else{
+            Toast.makeText(this, "Please login again", Toast.LENGTH_LONG)
+                .show()
+        }
 
         authViewModel.user.observe(this) {
+            Timber.d("user: $it")
             if (it != null) {
                 val timetableDays = it.timetable?.data
-                if( !timetableDays?.Monday.isNullOrEmpty() || !timetableDays?.Tuesday.isNullOrEmpty() || !timetableDays?.Wednesday.isNullOrEmpty() || !timetableDays?.Thursday.isNullOrEmpty() || !timetableDays?.Friday.isNullOrEmpty()){
+                if( !timetableDays?.Monday.isNullOrEmpty() || !timetableDays?.Tuesday.isNullOrEmpty() || !timetableDays?.Wednesday.isNullOrEmpty() || !timetableDays?.Thursday.isNullOrEmpty() || !timetableDays?.Friday.isNullOrEmpty()
+                    || !timetableDays?.Saturday.isNullOrEmpty() || !timetableDays?.Sunday.isNullOrEmpty()){
                     binding.loadingView.visibility = View.GONE
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                         createNotificationChannels()
