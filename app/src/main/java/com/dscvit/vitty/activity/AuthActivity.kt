@@ -77,11 +77,12 @@ class AuthActivity : AppCompatActivity() {
             val intent = Intent(this, HomeActivity::class.java)
             startActivity(intent)
             finish()
-        }else if(token!=null && username!=null && regno!=null) {
+        }else if(token!=null && username!=null) {
                 val intent = Intent(this, InstructionsActivity::class.java)
                 startActivity(intent)
                 finish()
         }else{
+            Timber.d("here going to add info")
             if (user != null) {
                 val intent = Intent(this, AddInfoActivity::class.java)
                 startActivity(intent)
@@ -217,7 +218,7 @@ class AuthActivity : AppCompatActivity() {
         authViewModel.user.observe(this){
             if(it!=null){
                 val timetableDays = it.timetable?.data
-                if( true /*!timetableDays.Monday.isNullOrEmpty() || !timetableDays.Tuesday.isNullOrEmpty() || !timetableDays.Wednesday.isNullOrEmpty() || !timetableDays.Thursday.isNullOrEmpty() || !timetableDays.Friday.isNullOrEmpty()*/) {
+                if( !timetableDays?.Monday.isNullOrEmpty() || !timetableDays?.Tuesday.isNullOrEmpty() || !timetableDays?.Wednesday.isNullOrEmpty() || !timetableDays?.Thursday.isNullOrEmpty() || !timetableDays?.Friday.isNullOrEmpty() || !timetableDays?.Saturday.isNullOrEmpty() || !timetableDays?.Sunday.isNullOrEmpty()) {
                     sharedPref.edit().putBoolean(Constants.COMMUNITY_TIMETABLE_AVAILABLE, true).apply()
                     val intent = Intent(this, HomeActivity::class.java)
                     startActivity(intent)

@@ -71,9 +71,12 @@ class AddInfoActivity : AppCompatActivity() {
         }
 
         authViewModel.user.observe(this){
+            Timber.d("User: ${it}")
             if(it!=null){
+
                 val timetableDays = it.timetable?.data
-                if( true /*!timetableDays.Monday.isNullOrEmpty() || !timetableDays.Tuesday.isNullOrEmpty() || !timetableDays.Wednesday.isNullOrEmpty() || !timetableDays.Thursday.isNullOrEmpty() || !timetableDays.Friday.isNullOrEmpty()*/) {
+                if(!timetableDays?.Monday.isNullOrEmpty() || !timetableDays?.Tuesday.isNullOrEmpty() || !timetableDays?.Wednesday.isNullOrEmpty() || !timetableDays?.Thursday.isNullOrEmpty() || !timetableDays?.Friday.isNullOrEmpty()
+                    || !timetableDays?.Saturday.isNullOrEmpty() || !timetableDays?.Sunday.isNullOrEmpty()){
                     binding.loadingView.visibility = View.GONE
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                         createNotificationChannels()
