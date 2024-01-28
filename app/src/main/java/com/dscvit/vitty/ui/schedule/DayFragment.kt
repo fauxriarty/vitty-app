@@ -1,25 +1,22 @@
 package com.dscvit.vitty.ui.schedule
 
 import android.content.Context
-import android.content.Intent
 import android.content.SharedPreferences
-import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.core.view.ViewCompat.setNestedScrollingEnabled
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dscvit.vitty.R
-import com.dscvit.vitty.activity.InstructionsActivity
 import com.dscvit.vitty.adapter.PeriodAdapter
 import com.dscvit.vitty.databinding.FragmentDayBinding
 import com.dscvit.vitty.model.PeriodDetails
 import com.dscvit.vitty.network.api.community.responses.timetable.Course
+import com.dscvit.vitty.network.api.community.responses.user.UserResponse
 import com.dscvit.vitty.util.Constants
 import com.dscvit.vitty.util.Constants.DEFAULT_QUOTE
 import com.dscvit.vitty.util.Constants.USER_INFO
@@ -27,7 +24,7 @@ import com.dscvit.vitty.util.Quote
 import com.dscvit.vitty.util.UtilFunctions
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.Source
+import com.google.gson.Gson
 import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -40,7 +37,8 @@ class DayFragment : Fragment() {
     private var fragID = -1
     private lateinit var sharedPref: SharedPreferences
     private val db = FirebaseFirestore.getInstance()
-    private val days = listOf("monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday")
+    private val days =
+        listOf("monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday")
     lateinit var day: String
     private lateinit var scheduleViewModel: ScheduleViewModel
 
@@ -61,9 +59,19 @@ class DayFragment : Fragment() {
         //get token and username from shared preferences
         val sharedPreferences = activity?.getSharedPreferences(USER_INFO, Context.MODE_PRIVATE)
         val token = sharedPreferences?.getString(Constants.COMMUNITY_TOKEN, "") ?: ""
-        val username = requireArguments().getString("username") ?: sharedPreferences?.getString(Constants.COMMUNITY_USERNAME, null) ?: ""
+        val username = requireArguments().getString("username") ?: sharedPreferences?.getString(
+            Constants.COMMUNITY_USERNAME,
+            null
+        ) ?: ""
         Timber.d("token $token username $username")
-        Timber.d("pref username is ${sharedPreferences?.getString(Constants.COMMUNITY_USERNAME, null)}")
+        Timber.d(
+            "pref username is ${
+                sharedPreferences?.getString(
+                    Constants.COMMUNITY_USERNAME,
+                    null
+                )
+            }"
+        )
         scheduleViewModel.getUserWithTimeTable(token, username)
         fragID = requireArguments().getString("frag_id")?.toInt()!!
         getData()
@@ -81,81 +89,90 @@ class DayFragment : Fragment() {
             "saturday"
         ).toString() else days[fragID]
 
-        scheduleViewModel.user.observe(viewLifecycleOwner){
-            if(it!=null){
+        val cachedData = sharedPref.getString(Constants.CACHE_COMMUNITY_TIMETABLE, null)
+        if (cachedData != null) {
+            // If cached data is available, load from cache
+            Timber.d("Loading from cache")
+            Timber.d("$cachedData")
+            val response = Gson().fromJson(cachedData, UserResponse::class.java)
+//            Toast.makeText(context, "Loaded from cache", Toast.LENGTH_SHORT).show()
+            processTimetableData(response)
+            UtilFunctions.reloadWidgets(requireContext())
+        }
+
+
+        scheduleViewModel.user.observe(viewLifecycleOwner) {
+            if (it != null) {
+                //cache response for widget
+                val response = Gson().toJson(it)
+                val editor = sharedPref.edit()
+                editor.putString(Constants.CACHE_COMMUNITY_TIMETABLE, response)
+                editor.apply()
+                val cachedData = sharedPref.getString(Constants.CACHE_COMMUNITY_TIMETABLE, null)
+                Timber.d("cached data is $cachedData")
+//                Toast.makeText(context, "Updated Timetable from internet.", Toast.LENGTH_SHORT).show()
+
+
                 Timber.d(it.toString())
-                val timetableDays = it.timetable?.data
-                when(day){
-                    "monday" -> {
-                        val monday = timetableDays?.Monday
-                        setUpDayTimeTable(monday)
-                    }
-                    "tuesday" -> {
-                        val tuesday = timetableDays?.Tuesday
-                        setUpDayTimeTable(tuesday)
-                    }
-                    "wednesday" -> {
-                        val wednesday = timetableDays?.Wednesday
-                        setUpDayTimeTable(wednesday)
-                    }
-                    "thursday" -> {
-                        val thursday = timetableDays?.Thursday
-                        setUpDayTimeTable(thursday)
-                    }
-                    "friday" -> {
-                        val friday = timetableDays?.Friday
-                        setUpDayTimeTable(friday)
-                    }
-                    "saturday" -> {
-                        val saturday = timetableDays?.Saturday
-                        setUpDayTimeTable(saturday)
-                    }
-                    "sunday" -> {
-                        val sunday = timetableDays?.Sunday
-                        setUpDayTimeTable(sunday)
-                    }
+
+                processTimetableData(it)
+
+            } else {
+                if (cachedData == null) {
+                    Toast.makeText(context, "Error fetching timetable", Toast.LENGTH_SHORT).show()
 
                 }
-
-            }else{
-                Toast.makeText(context, "Error fetching timetable", Toast.LENGTH_SHORT).show()
                 binding.loadingView.visibility = View.GONE
             }
         }
-        /*if (uid != null) {
-            db.collection("users")
-                .document(uid)
-                .collection("timetable")
-                .document(day)
-                .collection("periods")
-                .get(Source.CACHE)
-                .addOnSuccessListener { result ->
-                    for (document in result) {
-                        try {
-                            val pd = PeriodDetails(
-                                document.getString("courseCode")!!,
-                                document.getString("courseName")!!,
-                                document.getTimestamp("startTime")!!,
-                                document.getTimestamp("endTime")!!,
-                                document.getString("slot")!!,
-                                document.getString("location")!!
-                            )
-                            courseList.add(pd)
-                        } catch (e: Exception) {
-                        }
-                    }
-                    scheduleSetup()
-                }
-                .addOnFailureListener { e ->
-                    Timber.d("Auth error: $e")
-                }
-        }*/
+
+    }
+
+    private fun processTimetableData(userResponse: UserResponse) {
+        val timetableDays = userResponse.timetable?.data
+        when (day) {
+            "monday" -> {
+                val monday = timetableDays?.Monday
+                setUpDayTimeTable(monday)
+            }
+
+            "tuesday" -> {
+                val tuesday = timetableDays?.Tuesday
+                setUpDayTimeTable(tuesday)
+            }
+
+            "wednesday" -> {
+                val wednesday = timetableDays?.Wednesday
+                setUpDayTimeTable(wednesday)
+            }
+
+            "thursday" -> {
+                val thursday = timetableDays?.Thursday
+                setUpDayTimeTable(thursday)
+            }
+
+            "friday" -> {
+                val friday = timetableDays?.Friday
+                setUpDayTimeTable(friday)
+            }
+
+            "saturday" -> {
+                val saturday = timetableDays?.Saturday
+                setUpDayTimeTable(saturday)
+            }
+
+            "sunday" -> {
+                val sunday = timetableDays?.Sunday
+                setUpDayTimeTable(sunday)
+            }
+
+        }
     }
 
     private fun setUpDayTimeTable(day: List<Course>?) {
         courseList.clear()
-        if(!day.isNullOrEmpty()){
-            for (course in day){
+        if (!day.isNullOrEmpty()) {
+            for (course in day) {
                 val pd = PeriodDetails(
                     course.code,
                     course.name,
@@ -175,7 +192,7 @@ class DayFragment : Fragment() {
 
 
     private fun parseTimeToTimestamp(timeString: String): Timestamp {
-        try{
+        try {
             val time = replaceYearIfZero(timeString)
             val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
             // Set the time zone of the date format to UTC
@@ -186,10 +203,10 @@ class DayFragment : Fragment() {
                 val localTimeZone = TimeZone.getDefault()
                 val localDate = Date(date.time)
                 return Timestamp(localDate)
-            }else{
+            } else {
                 return Timestamp.now()
             }
-        }catch (e: Exception) {
+        } catch (e: Exception) {
             Timber.d("Date----: ${e.message}")
             return Timestamp.now()
         }
@@ -204,6 +221,7 @@ class DayFragment : Fragment() {
             return dateStr
         }
     }
+
     private fun scheduleSetup() {
         binding.apply {
             if (courseList.isNotEmpty()) {
@@ -231,7 +249,7 @@ class DayFragment : Fragment() {
                 "saturday"
             ).toString()
         ) {
-              getData()
+            getData()
         }
     }
 }
