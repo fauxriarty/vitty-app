@@ -3,15 +3,10 @@ package com.dscvit.vitty.activity
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
-import android.os.Build
 import android.os.Bundle
-import android.os.PowerManager
-import android.provider.Settings
-import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.edit
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.widget.ViewPager2
@@ -19,14 +14,10 @@ import com.dscvit.vitty.R
 import com.dscvit.vitty.adapter.IntroAdapter
 import com.dscvit.vitty.databinding.ActivityAuthBinding
 import com.dscvit.vitty.ui.auth.AuthViewModel
-import com.dscvit.vitty.util.ArraySaverLoader
 import com.dscvit.vitty.util.Constants
 import com.dscvit.vitty.util.Constants.TOKEN
 import com.dscvit.vitty.util.Constants.UID
 import com.dscvit.vitty.util.Constants.USER_INFO
-import com.dscvit.vitty.util.NotificationHelper
-import com.dscvit.vitty.util.NotificationHelper.setAlarm
-import com.dscvit.vitty.util.UtilFunctions
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -36,9 +27,7 @@ import com.google.android.gms.tasks.Task
 import com.google.android.material.tabs.TabLayoutMediator
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
-import com.google.firebase.firestore.Source
 import timber.log.Timber
-import java.util.ArrayList
 
 class AuthActivity : AppCompatActivity() {
 
@@ -67,7 +56,8 @@ class AuthActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
         sharedPref = getSharedPreferences(USER_INFO, Context.MODE_PRIVATE)
-        val isTimeTableAvailable = sharedPref.getBoolean(Constants.COMMUNITY_TIMETABLE_AVAILABLE, false)
+        val isTimeTableAvailable =
+            sharedPref.getBoolean(Constants.COMMUNITY_TIMETABLE_AVAILABLE, false)
         val token = sharedPref.getString(Constants.COMMUNITY_TOKEN, null)
         val username = sharedPref.getString(Constants.COMMUNITY_USERNAME, null)
         val regno = sharedPref.getString(Constants.COMMUNITY_REGNO, null)
@@ -77,11 +67,11 @@ class AuthActivity : AppCompatActivity() {
             val intent = Intent(this, HomeActivity::class.java)
             startActivity(intent)
             finish()
-        }else if(token!=null && username!=null) {
-                val intent = Intent(this, InstructionsActivity::class.java)
-                startActivity(intent)
-                finish()
-        }else{
+        } else if (token != null && username != null) {
+            val intent = Intent(this, InstructionsActivity::class.java)
+            startActivity(intent)
+            finish()
+        } else {
             Timber.d("here going to add info")
             if (user != null) {
                 val intent = Intent(this, AddInfoActivity::class.java)
@@ -157,7 +147,7 @@ class AuthActivity : AppCompatActivity() {
 
     private fun saveInfo(token: String?, uid: String?) {
         with(sharedPref.edit()) {
-            putString("sign_in_method", "Google")
+            putString("simethod", "Google")
             putString(TOKEN, token)
             putString(UID, uid)
             apply()
@@ -166,65 +156,73 @@ class AuthActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+        Timber.d("Activity Result")
         if (requestCode == SIGNIN) {
             val task: Task<GoogleSignInAccount> = GoogleSignIn.getSignedInAccountFromIntent(data)
             try {
                 val account = task.getResult(ApiException::class.java)
+                Timber.d("account: $account")
                 if (account != null) {
                     firebaseAuthWithGoogle(account)
                 }
-            } catch (e: ApiException) {
-                    logoutFailed()
+            } catch (e: Exception) {
+                Timber.d(e.toString())
+                logoutFailed()
             }
         }
     }
 
     private fun firebaseAuthWithGoogle(acct: GoogleSignInAccount) {
         val credential = GoogleAuthProvider.getCredential(acct.idToken, null)
+
         firebaseAuth.signInWithCredential(credential).addOnCompleteListener {
             if (it.isSuccessful) {
                 loginClick = true
                 val uid = firebaseAuth.currentUser?.uid
                 saveInfo(acct.idToken, uid)
-                authViewModel.signInAndGetTimeTable("","",uid?: "")
+                Timber.d("success uid: $uid")
+                authViewModel.signInAndGetTimeTable("", "", uid ?: "")
                 leadToNextPage()
 
 
             } else {
+                Timber.d(it.toString())
                 logoutFailed()
             }
+        }.addOnFailureListener { e ->
+            Timber.d(e.toString())
         }
     }
 
-    private fun leadToNextPage(){
-
+    private fun leadToNextPage() {
 
 
         authViewModel.signInResponse.observe(this) {
             if (it != null) {
-                Timber.d("here--"+it.toString())
+                Timber.d("here--" + it.toString())
                 sharedPref.edit().putString(Constants.COMMUNITY_USERNAME, it.username).apply()
                 sharedPref.edit().putString(Constants.COMMUNITY_TOKEN, it.token).apply()
                 sharedPref.edit().putString(Constants.COMMUNITY_NAME, it.name).apply()
                 sharedPref.edit().putString(Constants.COMMUNITY_PICTURE, it.picture).apply()
-            }else{
-                 val intent = Intent(this, AddInfoActivity::class.java)
-                 binding.loadingView.visibility = View.GONE
-                 startActivity(intent)
-                 finish()
+            } else {
+                val intent = Intent(this, AddInfoActivity::class.java)
+                binding.loadingView.visibility = View.GONE
+                startActivity(intent)
+                finish()
             }
         }
 
-        authViewModel.user.observe(this){
-            if(it!=null){
+        authViewModel.user.observe(this) {
+            if (it != null) {
                 val timetableDays = it.timetable?.data
-                if( !timetableDays?.Monday.isNullOrEmpty() || !timetableDays?.Tuesday.isNullOrEmpty() || !timetableDays?.Wednesday.isNullOrEmpty() || !timetableDays?.Thursday.isNullOrEmpty() || !timetableDays?.Friday.isNullOrEmpty() || !timetableDays?.Saturday.isNullOrEmpty() || !timetableDays?.Sunday.isNullOrEmpty()) {
-                    sharedPref.edit().putBoolean(Constants.COMMUNITY_TIMETABLE_AVAILABLE, true).apply()
+                if (!timetableDays?.Monday.isNullOrEmpty() || !timetableDays?.Tuesday.isNullOrEmpty() || !timetableDays?.Wednesday.isNullOrEmpty() || !timetableDays?.Thursday.isNullOrEmpty() || !timetableDays?.Friday.isNullOrEmpty() || !timetableDays?.Saturday.isNullOrEmpty() || !timetableDays?.Sunday.isNullOrEmpty()) {
+                    sharedPref.edit().putBoolean(Constants.COMMUNITY_TIMETABLE_AVAILABLE, true)
+                        .apply()
                     val intent = Intent(this, HomeActivity::class.java)
                     startActivity(intent)
                     finish()
                     binding.loadingView.visibility = View.GONE
-                }else{
+                } else {
                     val intent = Intent(this, InstructionsActivity::class.java)
                     startActivity(intent)
                     finish()
@@ -233,10 +231,6 @@ class AuthActivity : AppCompatActivity() {
             }
         }
     }
-
-
-
-
 
 
     override fun onBackPressed() {
