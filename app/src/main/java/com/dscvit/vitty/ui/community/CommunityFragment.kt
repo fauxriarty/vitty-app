@@ -2,6 +2,8 @@ package com.dscvit.vitty.ui.community
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -13,17 +15,15 @@ import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dscvit.vitty.R
 import com.dscvit.vitty.adapter.FriendAdapter
-import com.dscvit.vitty.adapter.PeriodAdapter
 import com.dscvit.vitty.adapter.PinnedFriendAdapterListener
 import com.dscvit.vitty.databinding.FragmentCommunityBinding
 import com.dscvit.vitty.network.api.community.responses.requests.RequestsResponse
 import com.dscvit.vitty.network.api.community.responses.user.FriendResponse
 import com.dscvit.vitty.network.api.community.responses.user.UserResponse
 import com.dscvit.vitty.util.Constants
-import com.dscvit.vitty.util.Quote
 import timber.log.Timber
 
-class CommunityFragment : Fragment(), PinnedFriendAdapterListener{
+class CommunityFragment : Fragment(), PinnedFriendAdapterListener {
 
     private var _binding: FragmentCommunityBinding? = null
 
@@ -45,12 +45,14 @@ class CommunityFragment : Fragment(), PinnedFriendAdapterListener{
         val root: View = binding.root
         binding.loadingView.visibility = View.VISIBLE
         //get token and username from shared preferences
-        sharedPreferences = requireActivity().getSharedPreferences(Constants.USER_INFO, Context.MODE_PRIVATE)
+        sharedPreferences =
+            requireActivity().getSharedPreferences(Constants.USER_INFO, Context.MODE_PRIVATE)
         val token = sharedPreferences.getString(Constants.COMMUNITY_TOKEN, "") ?: ""
         val username = sharedPreferences.getString(Constants.COMMUNITY_USERNAME, "") ?: ""
         Timber.d("TokenComm: $token")
         communityViewModel.getFriendList(token, username)
         communityViewModel.getFriendRequest(token)
+
         binding.communityToolbar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.requests -> {
@@ -58,6 +60,7 @@ class CommunityFragment : Fragment(), PinnedFriendAdapterListener{
                         .navigate(R.id.action_navigation_community_to_navigation_requests)
                     true
                 }
+
                 else -> {
                     false
                 }
@@ -82,6 +85,7 @@ class CommunityFragment : Fragment(), PinnedFriendAdapterListener{
         val token = sharedPreferences.getString(Constants.COMMUNITY_TOKEN, "") ?: ""
         communityViewModel.getFriendRequest(token)
     }
+
     private fun getData() {
         communityViewModel.friendList.observe(viewLifecycleOwner) {
             updatePins(it)
@@ -89,6 +93,7 @@ class CommunityFragment : Fragment(), PinnedFriendAdapterListener{
                 val allFriends = it.data
                 binding.apply {
                     if (!allFriends.isNullOrEmpty()) {
+                        binding.tipText.visibility = View.VISIBLE
                         friendsList.scheduleLayoutAnimation()
                         friendAdapter = FriendAdapter(allFriends, this@CommunityFragment)
                         friendsList.adapter = friendAdapter
@@ -101,12 +106,29 @@ class CommunityFragment : Fragment(), PinnedFriendAdapterListener{
                         } catch (_: Exception) {
                             Constants.DEFAULT_QUOTE
                         }*/
-                        noFriends.visibility = View.VISIBLE
+                        binding.noFriends.visibility = View.VISIBLE
+                        if (isNetworkAvailable()) {
+                            binding.noFriendsFound.text = "No friends found"
+                            binding.quoteLine.text = "Add friends to see their timetable"
+                        } else {
+                            binding.noFriendsFound.text = "No internet connection"
+                            binding.quoteLine.text = "Please check your internet connection"
+                        }
+                        binding.tipText.visibility = View.INVISIBLE
                         binding.loadingView.visibility = View.GONE
                     }
                 }
-            }else{
+            } else {
+                binding.tipText.visibility = View.INVISIBLE
                 binding.loadingView.visibility = View.GONE
+                binding.noFriends.visibility = View.VISIBLE
+                if (isNetworkAvailable()) {
+                    binding.noFriendsFound.text = "No friends found"
+                    binding.quoteLine.text = "Add friends to see their timetable"
+                } else {
+                    binding.noFriendsFound.text = "No internet connection"
+                    binding.quoteLine.text = "Please check your internet connection"
+                }
             }
         }
 
@@ -132,20 +154,29 @@ class CommunityFragment : Fragment(), PinnedFriendAdapterListener{
         }
     }
 
+    private fun isNetworkAvailable(): Boolean {
+        val connectivityManager =
+            context?.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val network = connectivityManager.activeNetwork
+        val capabilities = connectivityManager.getNetworkCapabilities(network)
+        return capabilities != null && (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
+                capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR))
+    }
+
     private fun getRequestList(it: RequestsResponse): List<UserResponse> {
         val requestList = mutableListOf<UserResponse>()
-        for (i in it){
+        for (i in it) {
             requestList.add(i.from)
         }
         return requestList
     }
 
     private fun updatePins(it: FriendResponse?) {
-        if(it != null){
+        if (it != null) {
             val pinnedFriends = getPinnedFriends()
             val allFriendsUsernames = it.data?.map { it.username }
-            for(i in pinnedFriends){
-                if(!allFriendsUsernames.isNullOrEmpty() && !allFriendsUsernames.contains(i)){
+            for (i in pinnedFriends) {
+                if (!allFriendsUsernames.isNullOrEmpty() && !allFriendsUsernames.contains(i)) {
                     unPinFriend(i)
                 }
             }
@@ -162,13 +193,16 @@ class CommunityFragment : Fragment(), PinnedFriendAdapterListener{
         val friend1 = sharedPreferences.getString(Constants.COMMUNITY_PINNED_FRIEND_1, null)
         val friend2 = sharedPreferences.getString(Constants.COMMUNITY_PINNED_FRIEND_2, null)
         val friend3 = sharedPreferences.getString(Constants.COMMUNITY_PINNED_FRIEND_3, null)
-        if(friend1 == null){
-            sharedPreferences.edit().putString(Constants.COMMUNITY_PINNED_FRIEND_1, username).apply()
-        }else if(friend2 == null){
-            sharedPreferences.edit().putString(Constants.COMMUNITY_PINNED_FRIEND_2, username).apply()
-        }else if(friend3 == null){
-            sharedPreferences.edit().putString(Constants.COMMUNITY_PINNED_FRIEND_3, username).apply()
-        }else{
+        if (friend1 == null) {
+            sharedPreferences.edit().putString(Constants.COMMUNITY_PINNED_FRIEND_1, username)
+                .apply()
+        } else if (friend2 == null) {
+            sharedPreferences.edit().putString(Constants.COMMUNITY_PINNED_FRIEND_2, username)
+                .apply()
+        } else if (friend3 == null) {
+            sharedPreferences.edit().putString(Constants.COMMUNITY_PINNED_FRIEND_3, username)
+                .apply()
+        } else {
             Toast.makeText(context, "You can pin only 3 friends", Toast.LENGTH_SHORT).show()
             return false
         }
@@ -184,13 +218,13 @@ class CommunityFragment : Fragment(), PinnedFriendAdapterListener{
         val friend3 = sharedPreferences.getString(Constants.COMMUNITY_PINNED_FRIEND_3, null)
 
         val pinnedFriends = mutableListOf<String>()
-        if(friend1 != null){
+        if (friend1 != null) {
             pinnedFriends.add(friend1)
         }
-        if(friend2 != null){
+        if (friend2 != null) {
             pinnedFriends.add(friend2)
         }
-        if(friend3 != null){
+        if (friend3 != null) {
             pinnedFriends.add(friend3)
         }
 
@@ -201,13 +235,13 @@ class CommunityFragment : Fragment(), PinnedFriendAdapterListener{
         val friend1 = sharedPreferences.getString(Constants.COMMUNITY_PINNED_FRIEND_1, null)
         val friend2 = sharedPreferences.getString(Constants.COMMUNITY_PINNED_FRIEND_2, null)
         val friend3 = sharedPreferences.getString(Constants.COMMUNITY_PINNED_FRIEND_3, null)
-        if(friend1 == username){
+        if (friend1 == username) {
             sharedPreferences.edit().putString(Constants.COMMUNITY_PINNED_FRIEND_1, null).apply()
-        }else if(friend2 == username){
+        } else if (friend2 == username) {
             sharedPreferences.edit().putString(Constants.COMMUNITY_PINNED_FRIEND_2, null).apply()
-        }else if(friend3 == username){
+        } else if (friend3 == username) {
             sharedPreferences.edit().putString(Constants.COMMUNITY_PINNED_FRIEND_3, null).apply()
-        }else{
+        } else {
             Toast.makeText(context, "Error in unpinning $username", Toast.LENGTH_SHORT).show()
             return false
         }
@@ -216,18 +250,23 @@ class CommunityFragment : Fragment(), PinnedFriendAdapterListener{
         val friend1New = sharedPreferences.getString(Constants.COMMUNITY_PINNED_FRIEND_1, null)
         val friend2New = sharedPreferences.getString(Constants.COMMUNITY_PINNED_FRIEND_2, null)
         val friend3New = sharedPreferences.getString(Constants.COMMUNITY_PINNED_FRIEND_3, null)
-        if(friend1New == null && friend2New != null){
-            sharedPreferences.edit().putString(Constants.COMMUNITY_PINNED_FRIEND_1, friend2New).apply()
-            if(friend3!=null){
-                sharedPreferences.edit().putString(Constants.COMMUNITY_PINNED_FRIEND_2, friend3).apply()
-                sharedPreferences.edit().putString(Constants.COMMUNITY_PINNED_FRIEND_3, null).apply()
-            }else{
-                sharedPreferences.edit().putString(Constants.COMMUNITY_PINNED_FRIEND_2, null).apply()
+        if (friend1New == null && friend2New != null) {
+            sharedPreferences.edit().putString(Constants.COMMUNITY_PINNED_FRIEND_1, friend2New)
+                .apply()
+            if (friend3 != null) {
+                sharedPreferences.edit().putString(Constants.COMMUNITY_PINNED_FRIEND_2, friend3)
+                    .apply()
+                sharedPreferences.edit().putString(Constants.COMMUNITY_PINNED_FRIEND_3, null)
+                    .apply()
+            } else {
+                sharedPreferences.edit().putString(Constants.COMMUNITY_PINNED_FRIEND_2, null)
+                    .apply()
             }
 
         }
-        if(friend2New == null && friend3New != null){
-            sharedPreferences.edit().putString(Constants.COMMUNITY_PINNED_FRIEND_2, friend3New).apply()
+        if (friend2New == null && friend3New != null) {
+            sharedPreferences.edit().putString(Constants.COMMUNITY_PINNED_FRIEND_2, friend3New)
+                .apply()
             sharedPreferences.edit().putString(Constants.COMMUNITY_PINNED_FRIEND_3, null).apply()
         }
 
