@@ -51,6 +51,7 @@ object LogoutHelper {
                 putString(Constants.COMMUNITY_PICTURE, null)
                 putString(Constants.COMMUNITY_REGNO, null)
                 putBoolean(Constants.COMMUNITY_TIMETABLE_AVAILABLE, false)
+                putString(Constants.CACHE_COMMUNITY_TIMETABLE, null)
                 apply()
             }
             prefs.edit().clear().apply();

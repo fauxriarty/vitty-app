@@ -7,7 +7,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.PowerManager
 import android.provider.Settings
@@ -15,6 +14,7 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.edit
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
@@ -27,13 +27,10 @@ import com.dscvit.vitty.util.ArraySaverLoader
 import com.dscvit.vitty.util.Constants
 import com.dscvit.vitty.util.LogoutHelper
 import com.dscvit.vitty.util.NotificationHelper
-import com.dscvit.vitty.util.NotificationHelper.setAlarm
 import com.dscvit.vitty.util.UtilFunctions
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Source
 import timber.log.Timber
-import java.util.ArrayList
 import java.util.Date
 
 class AddInfoActivity : AppCompatActivity() {
@@ -64,19 +61,20 @@ class AddInfoActivity : AppCompatActivity() {
                 prefs.edit().putString(Constants.COMMUNITY_TOKEN, it.token).apply()
                 prefs.edit().putString(Constants.COMMUNITY_NAME, it.name).apply()
                 prefs.edit().putString(Constants.COMMUNITY_PICTURE, it.picture).apply()
-            }else{
+            } else {
                 Toast.makeText(this, R.string.something_went_wrong, Toast.LENGTH_LONG).show()
                 binding.loadingView.visibility = View.GONE
             }
         }
 
-        authViewModel.user.observe(this){
+        authViewModel.user.observe(this) {
             Timber.d("User: ${it}")
-            if(it!=null){
+            if (it != null) {
 
                 val timetableDays = it.timetable?.data
-                if(!timetableDays?.Monday.isNullOrEmpty() || !timetableDays?.Tuesday.isNullOrEmpty() || !timetableDays?.Wednesday.isNullOrEmpty() || !timetableDays?.Thursday.isNullOrEmpty() || !timetableDays?.Friday.isNullOrEmpty()
-                    || !timetableDays?.Saturday.isNullOrEmpty() || !timetableDays?.Sunday.isNullOrEmpty()){
+                if (!timetableDays?.Monday.isNullOrEmpty() || !timetableDays?.Tuesday.isNullOrEmpty() || !timetableDays?.Wednesday.isNullOrEmpty() || !timetableDays?.Thursday.isNullOrEmpty() || !timetableDays?.Friday.isNullOrEmpty()
+                    || !timetableDays?.Saturday.isNullOrEmpty() || !timetableDays?.Sunday.isNullOrEmpty()
+                ) {
                     binding.loadingView.visibility = View.GONE
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                         createNotificationChannels()
@@ -84,7 +82,7 @@ class AddInfoActivity : AppCompatActivity() {
                         tellUpdated()
                     }
                     prefs.edit().putBoolean(Constants.COMMUNITY_TIMETABLE_AVAILABLE, true).apply()
-                }else{
+                } else {
                     val intent = Intent(this, InstructionsActivity::class.java)
                     binding.loadingView.visibility = View.GONE
                     startActivity(intent)
@@ -123,32 +121,33 @@ class AddInfoActivity : AppCompatActivity() {
     }
 
 
-
-      private fun setupContinueButton() {
-          binding.loadingView.visibility = View.VISIBLE
-          val uuid = prefs.getString(Constants.UID, null)
-          val username =binding.etUsername.text.toString().trim { it <= ' ' }
-          val regno = binding.etRegno.text.toString().uppercase().trim { it <= ' ' }
-          val regexPattern = Regex("^[0-9]{2}[a-zA-Z]{3}[0-9]{4}$")
-          if (username.isEmpty() || regno.isEmpty()) {
-                Toast.makeText(this, getString(R.string.fill_all_fields), Toast.LENGTH_LONG).show()
-                binding.loadingView.visibility = View.GONE
-            } else if (!regexPattern.matches(regno)) {
-                Toast.makeText(this, getString(R.string.invalid_regno), Toast.LENGTH_LONG).show()
-                binding.loadingView.visibility = View.GONE
+    private fun setupContinueButton() {
+        binding.loadingView.visibility = View.VISIBLE
+        val uuid = prefs.getString(Constants.UID, null)
+        val username = binding.etUsername.text.toString().trim { it <= ' ' }
+        val regno = binding.etRegno.text.toString().uppercase().trim { it <= ' ' }
+        val regexPattern = Regex("^[0-9]{2}[a-zA-Z]{3}[0-9]{4}$")
+        if (username.isEmpty() || regno.isEmpty()) {
+            Toast.makeText(this, getString(R.string.fill_all_fields), Toast.LENGTH_LONG).show()
+            binding.loadingView.visibility = View.GONE
+        } else if (!regexPattern.matches(regno)) {
+            Toast.makeText(this, getString(R.string.invalid_regno), Toast.LENGTH_LONG).show()
+            binding.loadingView.visibility = View.GONE
+        } else {
+            if (uuid != null) {
+                prefs.edit().putString(Constants.COMMUNITY_USERNAME, username).apply()
+                prefs.edit().putString(Constants.COMMUNITY_REGNO, regno).apply()
+                authViewModel.signInAndGetTimeTable(username, regno, uuid)
             } else {
-                if (uuid != null) {
-                    prefs.edit().putString(Constants.COMMUNITY_USERNAME, username).apply()
-                    prefs.edit().putString(Constants.COMMUNITY_REGNO, regno).apply()
-                    authViewModel.signInAndGetTimeTable(username, regno, uuid)
-                }else{
-                    Toast.makeText(this, getString(R.string.something_went_wrong), Toast.LENGTH_LONG).show()
-                    binding.loadingView.visibility = View.GONE
-                }
+                Toast.makeText(this, getString(R.string.something_went_wrong), Toast.LENGTH_LONG)
+                    .show()
+                binding.loadingView.visibility = View.GONE
             }
+        }
 
 
     }
+
     private fun setupToolbar() {
         binding.addInfoToolbar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
@@ -156,6 +155,7 @@ class AddInfoActivity : AppCompatActivity() {
                     LogoutHelper.logout(this, this as Activity, prefs)
                     true
                 }
+
                 else -> false
             }
         }

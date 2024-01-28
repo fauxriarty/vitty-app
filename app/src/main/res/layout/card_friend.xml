@@ -57,8 +57,8 @@
                     android:fontFamily="@font/poppins_500"
                     android:text="@={friendDetails.name}"
                     android:textColor="@color/white"
-                    tools:text="Krish Chatterjeeeeeeeeeee"
-                    android:textSize="18sp" />
+                    android:textSize="18sp"
+                    tools:text="Krish Chatterjeeeeeeeeeee" />
 
                 <TextView
                     android:id="@+id/friend_class"
@@ -83,9 +83,10 @@
                     android:id="@+id/pin"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:visibility="gone"
                     android:rotation="45"
-                    android:src="@drawable/ic_pin"/>
+                    android:src="@drawable/ic_pin"
+                    android:visibility="gone" />
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

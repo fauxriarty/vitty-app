@@ -3,9 +3,7 @@ package com.dscvit.vitty.ui.schedule
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.dscvit.vitty.network.api.community.APICommunityRestClient
-import com.dscvit.vitty.network.api.community.RetrofitCommunitySignInListener
 import com.dscvit.vitty.network.api.community.RetrofitSelfUserListener
-import com.dscvit.vitty.network.api.community.responses.user.SignInResponse
 import com.dscvit.vitty.network.api.community.responses.user.UserResponse
 import retrofit2.Call
 
@@ -21,6 +19,7 @@ class ScheduleViewModel : ViewModel() {
             object : RetrofitSelfUserListener {
                 override fun onSuccess(call: Call<UserResponse>?, response: UserResponse?) {
                     _user.postValue(response)
+
                 }
 
                 override fun onError(call: Call<UserResponse>?, t: Throwable?) {

@@ -2,11 +2,11 @@ package com.dscvit.vitty.ui.community
 
 import android.content.SharedPreferences
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dscvit.vitty.R
@@ -35,8 +35,8 @@ class AllRequestFragment : Fragment() {
         val requestList = binding.requestList
 
         prefs = requireContext().getSharedPreferences(Constants.USER_INFO, 0)
-        val token  = prefs.getString(Constants.COMMUNITY_TOKEN, null)
-        if(token != null){
+        val token = prefs.getString(Constants.COMMUNITY_TOKEN, null)
+        if (token != null) {
             communityViewModel.getFriendRequest(token)
         }
         binding.reqToolbar.setNavigationIcon(R.drawable.ic_back)
@@ -46,14 +46,15 @@ class AllRequestFragment : Fragment() {
 
 
         communityViewModel.friendRequest.observe(viewLifecycleOwner) {
-            updateViewVisibility(binding.noRequests, it,)
+            updateViewVisibility(binding.noRequests, it)
             Timber.d("FriendRequestList--: $it")
-        if (it != null && token != null && it.isNotEmpty()) {
+            if (it != null && token != null && it.isNotEmpty()) {
                 val requestListParsed = getRequestList(it)
-                if(requestListParsed.isNotEmpty()) {
+                if (requestListParsed.isNotEmpty()) {
                     requestList.visibility = View.VISIBLE
                     requestList.scheduleLayoutAnimation()
-                    searchAdapter = SearchAdapter(requestListParsed,
+                    searchAdapter = SearchAdapter(
+                        requestListParsed,
                         token, communityViewModel, isSearchMode = false, isAllReqPage = true
                     )
                     requestList.adapter = searchAdapter
@@ -61,14 +62,14 @@ class AllRequestFragment : Fragment() {
                     requestList.layoutManager = LinearLayoutManager(context)
                 }
 
-            }else{
+            } else {
                 requestList.visibility = View.GONE
                 binding.noRequests.visibility = View.VISIBLE
-        }
+            }
         }
 
-        communityViewModel.actionResponse.observe(viewLifecycleOwner){
-            if(it!=null){
+        communityViewModel.actionResponse.observe(viewLifecycleOwner) {
+            if (it != null) {
                 Timber.d("ActionResponse: $it")
                 Toast.makeText(context, it.detail, Toast.LENGTH_SHORT).show()
             }
@@ -80,11 +81,12 @@ class AllRequestFragment : Fragment() {
 
     private fun getRequestList(it: RequestsResponse): List<UserResponse> {
         val requestList = mutableListOf<UserResponse>()
-        for (i in it){
+        for (i in it) {
             requestList.add(i.from)
         }
         return requestList
     }
+
     private fun updateViewVisibility(view: View, friendRequestData: RequestsResponse?) {
         if (friendRequestData.isNullOrEmpty()) {
             view.visibility = View.VISIBLE

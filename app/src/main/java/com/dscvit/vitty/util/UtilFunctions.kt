@@ -100,9 +100,9 @@ object UtilFunctions {
             MediaStore.Images.Media.insertImage(
                 context.contentResolver, bitmap,
                 "VITTY Schedule taken on ${
-                dateFormatter.format(
-                    Date()
-                )
+                    dateFormatter.format(
+                        Date()
+                    )
                 }",
                 null
             )

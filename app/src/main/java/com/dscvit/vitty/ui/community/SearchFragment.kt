@@ -4,12 +4,11 @@ import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dscvit.vitty.R
@@ -34,7 +33,8 @@ class SearchFragment : Fragment() {
         val root: View = binding.root
         communityViewModel = ViewModelProvider(this)[CommunityViewModel::class.java]
         //get token from shared prefs
-        val sharedPreferences = activity?.getSharedPreferences(Constants.USER_INFO, Context.MODE_PRIVATE)
+        val sharedPreferences =
+            activity?.getSharedPreferences(Constants.USER_INFO, Context.MODE_PRIVATE)
         val token = sharedPreferences?.getString(Constants.COMMUNITY_TOKEN, null)
         binding.searchToolbar.setNavigationIcon(R.drawable.ic_back)
         binding.searchToolbar.setNavigationOnClickListener {
@@ -46,22 +46,24 @@ class SearchFragment : Fragment() {
 
 
 
-        communityViewModel.searchResult.observe(viewLifecycleOwner){
+        communityViewModel.searchResult.observe(viewLifecycleOwner) {
             Timber.d("SearchResult: $it")
-            if(it!=null){
+            if (it != null) {
                 val searchResult = removeSelfAndFriends(it)
                 binding.apply {
-                    if(searchResult.isNotEmpty()){
+                    if (searchResult.isNotEmpty()) {
                         searchList.scheduleLayoutAnimation()
                         searchList.adapter =
                             token?.let { token ->
-                                SearchAdapter(searchResult,
-                                    token, communityViewModel, true, false)
+                                SearchAdapter(
+                                    searchResult,
+                                    token, communityViewModel, true, false
+                                )
                             }
                         searchList.layoutManager = LinearLayoutManager(context)
                         noSearchResults.visibility = View.INVISIBLE
                         searchList.visibility = View.VISIBLE
-                    }else{
+                    } else {
                         searchList.visibility = View.GONE
                         noSearchResults.visibility = View.VISIBLE
                     }
@@ -78,7 +80,8 @@ class SearchFragment : Fragment() {
 
         val searchEditText = binding.searchFriendsText
         searchEditText.requestFocus()
-        val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        val imm =
+            requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.showSoftInput(searchEditText, InputMethodManager.SHOW_IMPLICIT)
         binding.searchFriendsText.setCompoundDrawablesWithIntrinsicBounds(
             R.drawable.ic_search,
@@ -94,9 +97,9 @@ class SearchFragment : Fragment() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 val query = s.toString().trim()
                 Timber.d("Query2--$token-: $query")
-                if(token!=null){
+                if (token != null) {
                     Timber.d("Qer---: $query")
-                    if(query.isEmpty()){
+                    if (query.isEmpty()) {
                         Timber.d("Qur2---: $query")
                         binding.searchList.visibility = View.GONE
                         binding.noSearchResults.visibility = View.VISIBLE
@@ -106,9 +109,9 @@ class SearchFragment : Fragment() {
                             0,
                             0
                         )
-                    }else{
+                    } else {
                         Timber.d("Query---: $query")
-                        communityViewModel.getSearchResult(token,query)
+                        communityViewModel.getSearchResult(token, query)
                         binding.searchFriendsText.setCompoundDrawablesWithIntrinsicBounds(
                             0,
                             0,

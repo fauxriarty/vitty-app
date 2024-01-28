@@ -14,49 +14,49 @@
         android:id="@+id/navigation_community"
         android:name="com.dscvit.vitty.ui.community.CommunityFragment"
         android:label="@string/title_community"
-        tools:layout="@layout/fragment_community" >
+        tools:layout="@layout/fragment_community">
         <action
             android:id="@+id/action_navigation_community_to_navigation_requests"
+            app:destination="@id/navigation_requests"
             app:enterAnim="@anim/slide_in_right"
-            app:popExitAnim="@anim/slide_out_right"
-            app:destination="@id/navigation_requests" />
+            app:popExitAnim="@anim/slide_out_right" />
         <action
             android:id="@+id/action_navigation_community_to_friendFragment"
+            app:destination="@id/friendFragment"
             app:enterAnim="@anim/slide_in_right"
-            app:popExitAnim="@anim/slide_out_right"
-            app:destination="@id/friendFragment" />
+            app:popExitAnim="@anim/slide_out_right" />
     </fragment>
     <fragment
         android:id="@+id/navigation_requests"
         android:name="com.dscvit.vitty.ui.community.RequestsFragment"
         android:label="Requests"
-        tools:layout="@layout/fragment_requests" >
+        tools:layout="@layout/fragment_requests">
         <action
             android:id="@+id/action_navigation_requests_to_searchFragment"
+            app:destination="@id/searchFragment"
             app:enterAnim="@anim/slide_in_right"
-            app:popExitAnim="@anim/slide_out_right"
-            app:destination="@id/searchFragment" />
+            app:popExitAnim="@anim/slide_out_right" />
         <action
             android:id="@+id/action_navigation_requests_to_friendFragment"
+            app:destination="@id/friendFragment"
             app:enterAnim="@anim/slide_in_right"
-            app:popExitAnim="@anim/slide_out_right"
-            app:destination="@id/friendFragment" />
+            app:popExitAnim="@anim/slide_out_right" />
         <action
             android:id="@+id/action_navigation_requests_to_allRequestFragment"
+            app:destination="@id/allRequestFragment"
             app:enterAnim="@anim/slide_in_right"
-            app:popExitAnim="@anim/slide_out_right"
-            app:destination="@id/allRequestFragment" />
+            app:popExitAnim="@anim/slide_out_right" />
     </fragment>
     <fragment
         android:id="@+id/searchFragment"
         android:name="com.dscvit.vitty.ui.community.SearchFragment"
         android:label="fragment_search"
-        tools:layout="@layout/fragment_search" >
+        tools:layout="@layout/fragment_search">
         <action
             android:id="@+id/action_searchFragment_to_friendFragment"
+            app:destination="@id/friendFragment"
             app:enterAnim="@anim/slide_in_right"
-            app:popExitAnim="@anim/slide_out_right"
-            app:destination="@id/friendFragment" />
+            app:popExitAnim="@anim/slide_out_right" />
     </fragment>
     <fragment
         android:id="@+id/friendFragment"
@@ -67,11 +67,11 @@
         android:id="@+id/allRequestFragment"
         android:name="com.dscvit.vitty.ui.community.AllRequestFragment"
         android:label="fragment_all_request"
-        tools:layout="@layout/fragment_all_request" >
+        tools:layout="@layout/fragment_all_request">
         <action
             android:id="@+id/action_allRequestFragment_to_friendFragment"
+            app:destination="@id/friendFragment"
             app:enterAnim="@anim/slide_in_right"
-            app:popExitAnim="@anim/slide_out_right"
-            app:destination="@id/friendFragment" />
+            app:popExitAnim="@anim/slide_out_right" />
     </fragment>
 </navigation>

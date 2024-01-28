@@ -33,6 +33,7 @@ class ApiEventRestClient {
                     retrofitEventListener.onSuccess(call, response.body())
                 }
             }
+
             override fun onFailure(call: Call<EventDetails>, t: Throwable) {
                 retrofitEventListener.onError(call, t)
             }

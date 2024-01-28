@@ -3,22 +3,18 @@ package com.dscvit.vitty.network.api.community
 import com.dscvit.vitty.network.api.community.requests.AuthRequestBody
 import com.dscvit.vitty.network.api.community.requests.UsernameRequestBody
 import com.dscvit.vitty.network.api.community.responses.requests.RequestsResponse
-import com.dscvit.vitty.network.api.community.responses.requests.RequestsResponseItem
 import com.dscvit.vitty.network.api.community.responses.user.FriendResponse
 import com.dscvit.vitty.network.api.community.responses.user.PostResponse
 import com.dscvit.vitty.network.api.community.responses.user.SignInResponse
 import com.dscvit.vitty.network.api.community.responses.user.UserResponse
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
-import org.json.JSONException
-import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import timber.log.Timber
 
 class APICommunityRestClient {
-
 
 
     companion object {
@@ -35,10 +31,9 @@ class APICommunityRestClient {
         uuid: String,
         retrofitCommunitySignInListener: RetrofitCommunitySignInListener,
         retrofitSelfUserListener: RetrofitSelfUserListener
-    ){
+    ) {
 
         mApiUser = retrofit.create<APICommunity>(APICommunity::class.java)
-
 
 
         val requestBody = AuthRequestBody(
@@ -50,12 +45,15 @@ class APICommunityRestClient {
         val apiSignInCall = mApiUser!!.signInInfo(requestBody)
 
         apiSignInCall.enqueue(object : Callback<SignInResponse> {
-            override fun onResponse(call: Call<SignInResponse>, response: Response<SignInResponse>) {
+            override fun onResponse(
+                call: Call<SignInResponse>,
+                response: Response<SignInResponse>
+            ) {
                 retrofitCommunitySignInListener.onSuccess(call, response.body())
                 val token = response.body()?.token.toString()
                 val res_username = response.body()?.username.toString()
 
-                getUserWithTimeTable( token, res_username, retrofitSelfUserListener,)
+                getUserWithTimeTable(token, res_username, retrofitSelfUserListener)
 
             }
 
@@ -66,11 +64,15 @@ class APICommunityRestClient {
         })
     }
 
-    fun getUserWithTimeTable(token: String, username: String, retrofitSelfUserListener: RetrofitSelfUserListener) {
+    fun getUserWithTimeTable(
+        token: String,
+        username: String,
+        retrofitSelfUserListener: RetrofitSelfUserListener
+    ) {
         val bearerToken = "Bearer $token"
 
         mApiUser = retrofit.create<APICommunity>(APICommunity::class.java)
-        val apiUserCall =  mApiUser!!.getUser(bearerToken, username)
+        val apiUserCall = mApiUser!!.getUser(bearerToken, username)
         apiUserCall.enqueue(object : Callback<UserResponse> {
             override fun onResponse(call: Call<UserResponse>, response: Response<UserResponse>) {
                 retrofitSelfUserListener.onSuccess(call, response.body())
@@ -84,13 +86,20 @@ class APICommunityRestClient {
     }
 
 
-    fun getFriendList(token: String, username: String, retrofitFriendListListener: RetrofitFriendListListener ){
+    fun getFriendList(
+        token: String,
+        username: String,
+        retrofitFriendListListener: RetrofitFriendListListener
+    ) {
         val bearerToken = "Bearer $token"
 
         mApiUser = retrofit.create<APICommunity>(APICommunity::class.java)
         val apiFriendListCall = mApiUser!!.getFriendList(bearerToken, username)
         apiFriendListCall.enqueue(object : Callback<FriendResponse> {
-            override fun onResponse(call: Call<FriendResponse>, response: Response<FriendResponse>) {
+            override fun onResponse(
+                call: Call<FriendResponse>,
+                response: Response<FriendResponse>
+            ) {
                 retrofitFriendListListener.onSuccess(call, response.body())
             }
 
@@ -104,13 +113,16 @@ class APICommunityRestClient {
         token: String,
         query: String,
         retrofitSearchResultListener: RetrofitSearchResultListener
-    ){
+    ) {
         val bearerToken = "Bearer $token"
 
         mApiUser = retrofit.create<APICommunity>(APICommunity::class.java)
-        val apiSearchResultCall = mApiUser!!.searchUsers(bearerToken,query)
+        val apiSearchResultCall = mApiUser!!.searchUsers(bearerToken, query)
         apiSearchResultCall.enqueue(object : Callback<List<UserResponse>> {
-            override fun onResponse(call: Call<List<UserResponse>>, response: Response<List<UserResponse>>) {
+            override fun onResponse(
+                call: Call<List<UserResponse>>,
+                response: Response<List<UserResponse>>
+            ) {
                 Timber.d("SearchResult4: $response")
                 retrofitSearchResultListener.onSuccess(call, response.body())
             }
@@ -124,13 +136,16 @@ class APICommunityRestClient {
     fun getSuggestedFriends(
         token: String,
         retrofitSearchResultListener: RetrofitSearchResultListener
-    ){
+    ) {
         val bearerToken = "Bearer $token"
 
         mApiUser = retrofit.create<APICommunity>(APICommunity::class.java)
         val apiSuggestedResultCall = mApiUser!!.getSuggestedFriends(bearerToken)
         apiSuggestedResultCall.enqueue(object : Callback<List<UserResponse>> {
-            override fun onResponse(call: Call<List<UserResponse>>, response: Response<List<UserResponse>>) {
+            override fun onResponse(
+                call: Call<List<UserResponse>>,
+                response: Response<List<UserResponse>>
+            ) {
                 Timber.d("SearchResult4: $response")
                 retrofitSearchResultListener.onSuccess(call, response.body())
             }
@@ -144,13 +159,16 @@ class APICommunityRestClient {
     fun getFriendRequest(
         token: String,
         retrofitFriendRequestListener: RetrofitFriendRequestListener
-    ){
+    ) {
         val bearerToken = "Bearer $token"
         Timber.d("FriendReqToken--: $bearerToken")
         mApiUser = retrofit.create<APICommunity>(APICommunity::class.java)
         val apiFriendRequestCall = mApiUser!!.getFriendRequests(bearerToken)
         apiFriendRequestCall.enqueue(object : Callback<RequestsResponse> {
-            override fun onResponse(call: Call<RequestsResponse>, response: Response<RequestsResponse>) {
+            override fun onResponse(
+                call: Call<RequestsResponse>,
+                response: Response<RequestsResponse>
+            ) {
                 Timber.d("FriendRequest--: $response")
                 retrofitFriendRequestListener.onSuccess(call, response.body())
             }
@@ -163,7 +181,11 @@ class APICommunityRestClient {
         )
     }
 
-    fun acceptRequest(token: String, username: String, retrofitUserActionListener: RetrofitUserActionListener) {
+    fun acceptRequest(
+        token: String,
+        username: String,
+        retrofitUserActionListener: RetrofitUserActionListener
+    ) {
         val bearerToken = "Bearer $token"
 
         mApiUser = retrofit.create<APICommunity>(APICommunity::class.java)
@@ -180,7 +202,11 @@ class APICommunityRestClient {
 
     }
 
-    fun rejectRequest(token: String, username: String, retrofitUserActionListener: RetrofitUserActionListener) {
+    fun rejectRequest(
+        token: String,
+        username: String,
+        retrofitUserActionListener: RetrofitUserActionListener
+    ) {
         val bearerToken = "Bearer $token"
 
         mApiUser = retrofit.create<APICommunity>(APICommunity::class.java)
@@ -197,7 +223,11 @@ class APICommunityRestClient {
 
     }
 
-    fun sendRequest(token: String, username: String, retrofitUserActionListener: RetrofitUserActionListener) {
+    fun sendRequest(
+        token: String,
+        username: String,
+        retrofitUserActionListener: RetrofitUserActionListener
+    ) {
         val bearerToken = "Bearer $token"
 
         mApiUser = retrofit.create<APICommunity>(APICommunity::class.java)
@@ -214,7 +244,11 @@ class APICommunityRestClient {
 
     }
 
-    fun unfriend(token: String,username: String, retrofitUserActionListener: RetrofitUserActionListener){
+    fun unfriend(
+        token: String,
+        username: String,
+        retrofitUserActionListener: RetrofitUserActionListener
+    ) {
         val bearerToken = "Bearer $token"
 
         mApiUser = retrofit.create<APICommunity>(APICommunity::class.java)
@@ -236,7 +270,7 @@ class APICommunityRestClient {
         val apiCheckUsernameCall = mApiUser!!.checkUsername(usernameRequestBody)
         apiCheckUsernameCall.enqueue(object : Callback<PostResponse> {
             override fun onResponse(call: Call<PostResponse>, response: Response<PostResponse>) {
-                if(response.isSuccessful) {
+                if (response.isSuccessful) {
                     retrofitUserActionListener.onSuccess(call, response.body())
                 } else {
                     val gson = Gson()

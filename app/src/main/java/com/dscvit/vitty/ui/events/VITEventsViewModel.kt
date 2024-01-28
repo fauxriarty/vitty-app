@@ -3,9 +3,9 @@ package com.dscvit.vitty.ui.events
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.dscvit.vitty.model.EventDetails
 import com.dscvit.vitty.network.api.events.ApiEventRestClient
 import com.dscvit.vitty.network.api.events.RetrofitEventListener
-import com.dscvit.vitty.model.EventDetails
 import retrofit2.Call
 
 class VITEventsViewModel : ViewModel() {
@@ -21,6 +21,7 @@ class VITEventsViewModel : ViewModel() {
             override fun onSuccess(call: Call<EventDetails>?, response: EventDetails?) {
                 _events.postValue(response)
             }
+
             override fun onError(call: Call<EventDetails>?, t: Throwable?) {
                 _events.postValue(null)
             }

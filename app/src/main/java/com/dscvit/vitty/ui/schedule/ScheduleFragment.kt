@@ -1,6 +1,5 @@
 package com.dscvit.vitty.ui.schedule
 
-import android.animation.ObjectAnimator
 import android.app.Activity
 import android.app.PendingIntent
 import android.content.Intent
@@ -8,18 +7,15 @@ import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.MenuInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.ImageView
 import android.widget.PopupMenu
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.edit
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import coil.load
 import com.dscvit.vitty.BuildConfig
 import com.dscvit.vitty.R
@@ -75,11 +71,6 @@ class ScheduleFragment : Fragment() {
 
         return root
     }
-
-
-
-
-
 
 
     private fun checkExamMode() {
@@ -176,7 +167,6 @@ class ScheduleFragment : Fragment() {
     }
 
 
-
     private fun firstTimeSetup() {
         val max = 6
         val upCode = prefs.getInt(Constants.UPDATE_CODE, 0)
@@ -254,7 +244,7 @@ class ScheduleFragment : Fragment() {
     private fun introMessage(pos: Int): List<String> {
         return when (pos) {
             0 -> listOf(getString(R.string.congratulations), getString(R.string.complete_msg))
-            1 ->  listOf(getString(R.string.new_updates), getString(R.string.about_new_updates))
+            1 -> listOf(getString(R.string.new_updates), getString(R.string.about_new_updates))
             2 -> listOf(getString(R.string.widgets), getString(R.string.about_widgets))
             3 -> listOf(getString(R.string.notifications), getString(R.string.about_notifications))
             4 -> listOf(getString(R.string.battery), getString(R.string.about_battery))
@@ -273,14 +263,17 @@ class ScheduleFragment : Fragment() {
                     LogoutHelper.logout(requireContext(), requireContext() as Activity, prefs)
                     true
                 }
+
                 R.id.settings -> {
                     startActivity(Intent(context, SettingsActivity::class.java))
                     true
                 }
+
                 R.id.support -> {
                     UtilFunctions.openLink(requireContext(), getString(R.string.telegram_link))
                     true
                 }
+
                 R.id.share -> {
                     val shareIntent = Intent().apply {
                         action = Intent.ACTION_SEND
@@ -310,6 +303,7 @@ class ScheduleFragment : Fragment() {
                     )
                     true
                 }
+
                 else -> false
             }
         }

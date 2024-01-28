@@ -41,6 +41,7 @@ class VITEventsActivity : AppCompatActivity() {
                     onBackPressed()
                     true
                 }
+
                 else -> false
             }
         }

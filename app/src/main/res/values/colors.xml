@@ -19,6 +19,7 @@
     <color name="next_class_2">#1A126AFC</color>
     <color name="transparent">#00000000</color>
     <color name="red">#F61F1F</color>
-    <color name="mtrl_textinput_default_box_stroke_color" tools:override="true">@color/translucent</color>
+    <color name="mtrl_textinput_default_box_stroke_color" tools:override="true">@color/translucent
+    </color>
     <color name="mtrl_textinput_bg_color" tools:override="true">#0E2336</color>
 </resources>

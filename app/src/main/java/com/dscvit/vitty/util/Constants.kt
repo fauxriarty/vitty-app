@@ -25,7 +25,7 @@ object Constants {
     const val GDSCVIT_TAG = "gdscvit_website"
     const val GDSCVIT_WEBSITE = "https://dscvit.com/"
     const val VITTY_APP_URL = "https://dscv.it/app/vitty"
-    const val VITTY_URL = "https://dscv.it/vitty"
+    const val VITTY_URL = "https://dscv.it/vittyconnect"
     const val ALARM_INTENT = 0
     const val TODAY_INTENT = 1
     const val NEXT_CLASS_INTENT = 2
@@ -47,4 +47,6 @@ object Constants {
     const val COMMUNITY_PINNED_FRIEND_1 = "community_pinned_friend_1"
     const val COMMUNITY_PINNED_FRIEND_2 = "community_pinned_friend_2"
     const val COMMUNITY_PINNED_FRIEND_3 = "community_pinned_friend_3"
+
+    const val CACHE_COMMUNITY_TIMETABLE = "cache_community_timetable"
 }

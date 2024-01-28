@@ -27,8 +27,12 @@ class EventAdapter(private val dataSet: List<Event>) :
     }
 
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
-        val date: Date = SimpleDateFormat("hh:mm z", Locale.getDefault()).parse("${dataSet[position].Time} IST") as Date
-        val time: String = SimpleDateFormat("h:mm a", Locale.getDefault()).format(date).uppercase(Locale.ROOT)
+        val date: Date = SimpleDateFormat(
+            "hh:mm z",
+            Locale.getDefault()
+        ).parse("${dataSet[position].Time} IST") as Date
+        val time: String =
+            SimpleDateFormat("h:mm a", Locale.getDefault()).format(date).uppercase(Locale.ROOT)
         viewHolder.eventName.text = dataSet[position].EventName
         viewHolder.eventTime.text = time
     }
