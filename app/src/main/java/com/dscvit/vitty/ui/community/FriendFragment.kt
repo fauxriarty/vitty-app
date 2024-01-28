@@ -256,7 +256,7 @@ class FriendFragment : Fragment() {
             else -> 0
         }
 
-        val pagerAdapter = DayAdapter(this, username)
+        val pagerAdapter = DayAdapter(this, username, true)
         binding.pager.adapter = pagerAdapter
         TabLayoutMediator(
             binding.tabs, binding.pager

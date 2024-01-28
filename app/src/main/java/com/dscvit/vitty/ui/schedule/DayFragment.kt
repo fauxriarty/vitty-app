@@ -41,6 +41,7 @@ class DayFragment : Fragment() {
         listOf("monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday")
     lateinit var day: String
     private lateinit var scheduleViewModel: ScheduleViewModel
+    private var isFriendsTimetable = false
 
 
     override fun onCreateView(
@@ -63,6 +64,7 @@ class DayFragment : Fragment() {
             Constants.COMMUNITY_USERNAME,
             null
         ) ?: ""
+        isFriendsTimetable = requireArguments().getBoolean("isFriendsTimetable")
         Timber.d("token $token username $username")
         Timber.d(
             "pref username is ${
@@ -90,26 +92,30 @@ class DayFragment : Fragment() {
         ).toString() else days[fragID]
 
         val cachedData = sharedPref.getString(Constants.CACHE_COMMUNITY_TIMETABLE, null)
-        if (cachedData != null) {
+        if (cachedData != null && !isFriendsTimetable) {
             // If cached data is available, load from cache
             Timber.d("Loading from cache")
             Timber.d("$cachedData")
             val response = Gson().fromJson(cachedData, UserResponse::class.java)
 //            Toast.makeText(context, "Loaded from cache", Toast.LENGTH_SHORT).show()
             processTimetableData(response)
-            UtilFunctions.reloadWidgets(requireContext())
+
         }
 
+        UtilFunctions.reloadWidgets(requireContext())
 
         scheduleViewModel.user.observe(viewLifecycleOwner) {
             if (it != null) {
                 //cache response for widget
-                val response = Gson().toJson(it)
-                val editor = sharedPref.edit()
-                editor.putString(Constants.CACHE_COMMUNITY_TIMETABLE, response)
-                editor.apply()
-                val cachedData = sharedPref.getString(Constants.CACHE_COMMUNITY_TIMETABLE, null)
-                Timber.d("cached data is $cachedData")
+                if(!isFriendsTimetable) {
+                    val response = Gson().toJson(it)
+                    val editor = sharedPref.edit()
+                    editor.putString(Constants.CACHE_COMMUNITY_TIMETABLE, response)
+                    editor.apply()
+                    val cachedData = sharedPref.getString(Constants.CACHE_COMMUNITY_TIMETABLE, null)
+                    Timber.d("cached data is $cachedData")
+                }
+
 //                Toast.makeText(context, "Updated Timetable from internet.", Toast.LENGTH_SHORT).show()
 
 
