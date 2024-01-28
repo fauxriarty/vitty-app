@@ -24,9 +24,9 @@
                 android:paddingEnd="10dp"
                 android:paddingBottom="10dp"
                 app:menu="@menu/community_menu"
-                app:title="@string/title_community"
+                app:title="@string/title_connect"
                 app:titleTextAppearance="@style/TitleTextAppearance"
-                app:titleTextColor="@color/white" >
+                app:titleTextColor="@color/white">
 
                 <TextView
                     android:id="@+id/friend_requests_notification"
@@ -39,9 +39,9 @@
                     android:gravity="center"
                     android:paddingStart="4dp"
                     android:paddingEnd="4dp"
-                    android:visibility="invisible"
+                    android:text="2 Req"
                     android:textColor="@android:color/white"
-                    android:text="2 Req" />
+                    android:visibility="invisible" />
 
             </com.google.android.material.appbar.MaterialToolbar>
 
@@ -49,22 +49,37 @@
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/friends_list"
-            android:layout_below="@id/community_appbar"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:visibility="visible"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/community_appbar"
             android:clipToPadding="false"
             android:layoutAnimation="@anim/layout_animation"
             android:paddingTop="10dp"
-            tools:listitem="@layout/card_friend"
             android:paddingBottom="10dp"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+            android:visibility="visible"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            tools:listitem="@layout/card_friend" />
+
+
+        <TextView
+            android:id="@+id/tip_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/friends_list"
+            android:layout_centerHorizontal="true"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:fontFamily="@font/poppins_300"
+            android:text="Tip: Long press on a friend to pin them."
+            android:textAlignment="center"
+            android:textSize="10sp" />
+
 
         <RelativeLayout
             android:id="@+id/no_friends"
-            android:layout_below="@id/community_appbar"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_below="@id/community_appbar"
             android:orientation="vertical"
             android:visibility="invisible"
             tools:visibility="visible">
