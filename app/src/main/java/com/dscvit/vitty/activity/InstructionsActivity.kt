@@ -4,28 +4,23 @@ import android.app.Activity
 import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
-import android.content.Context.ALARM_SERVICE
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
 import android.os.PowerManager
 import android.provider.Settings
-import android.util.Log
-import android.view.Gravity.apply
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.edit
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.dscvit.vitty.BuildConfig
 import com.dscvit.vitty.R
 import com.dscvit.vitty.databinding.ActivityInstructionsBinding
 import com.dscvit.vitty.receiver.AlarmReceiver
 import com.dscvit.vitty.ui.auth.AuthViewModel
-import com.dscvit.vitty.ui.schedule.ScheduleViewModel
 import com.dscvit.vitty.util.ArraySaverLoader.loadArray
 import com.dscvit.vitty.util.ArraySaverLoader.saveArray
 import com.dscvit.vitty.util.Constants
@@ -46,7 +41,6 @@ import com.dscvit.vitty.util.UtilFunctions
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Source
 import timber.log.Timber
-import java.util.ArrayList
 import java.util.Date
 
 class InstructionsActivity : AppCompatActivity() {
@@ -64,7 +58,7 @@ class InstructionsActivity : AppCompatActivity() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_instructions)
         prefs = getSharedPreferences(USER_INFO, 0)
         uid = prefs.getString(UID, "").toString()
-        authViewModel =  ViewModelProvider(this)[AuthViewModel::class.java]
+        authViewModel = ViewModelProvider(this)[AuthViewModel::class.java]
         setupToolbar()
         setGDSCVITChannel()
 
@@ -95,9 +89,9 @@ class InstructionsActivity : AppCompatActivity() {
 
         Timber.d("done button clicked")
 
-        if(token!=null && username!=null){
+        if (token != null && username != null) {
             authViewModel.getUserWithTimeTable(token, username)
-        }else{
+        } else {
             Toast.makeText(this, "Please login again", Toast.LENGTH_LONG)
                 .show()
         }
@@ -106,15 +100,16 @@ class InstructionsActivity : AppCompatActivity() {
             Timber.d("user: $it")
             if (it != null) {
                 val timetableDays = it.timetable?.data
-                if( !timetableDays?.Monday.isNullOrEmpty() || !timetableDays?.Tuesday.isNullOrEmpty() || !timetableDays?.Wednesday.isNullOrEmpty() || !timetableDays?.Thursday.isNullOrEmpty() || !timetableDays?.Friday.isNullOrEmpty()
-                    || !timetableDays?.Saturday.isNullOrEmpty() || !timetableDays?.Sunday.isNullOrEmpty()){
+                if (!timetableDays?.Monday.isNullOrEmpty() || !timetableDays?.Tuesday.isNullOrEmpty() || !timetableDays?.Wednesday.isNullOrEmpty() || !timetableDays?.Thursday.isNullOrEmpty() || !timetableDays?.Friday.isNullOrEmpty()
+                    || !timetableDays?.Saturday.isNullOrEmpty() || !timetableDays?.Sunday.isNullOrEmpty()
+                ) {
                     binding.loadingView.visibility = View.GONE
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                         createNotificationChannels()
                     } else {
                         tellUpdated()
                     }
-                }else{
+                } else {
                     binding.loadingView.visibility = View.GONE
                     Toast.makeText(this, getString(R.string.follow_instructions), Toast.LENGTH_LONG)
                         .show()
@@ -288,6 +283,7 @@ class InstructionsActivity : AppCompatActivity() {
                     LogoutHelper.logout(this, this as Activity, prefs)
                     true
                 }
+
                 else -> false
             }
         }

@@ -60,33 +60,32 @@
                 android:id="@+id/search_friends_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:maxLines="1"
                 android:inputType="text"
-                android:textCursorDrawable="@drawable/cursor_white"
-                android:textColor="@color/white" />
+                android:maxLines="1"
+                android:textColor="@color/white"
+                android:textCursorDrawable="@drawable/cursor_white" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/search_list"
-            android:layout_below="@id/search_friends"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:visibility="visible"
+            android:layout_below="@id/search_friends"
             android:clipToPadding="false"
             android:layoutAnimation="@anim/layout_animation"
             android:paddingTop="10dp"
-            tools:listitem="@layout/card_friend"
             android:paddingBottom="10dp"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
-
+            android:visibility="visible"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            tools:listitem="@layout/card_friend" />
 
 
         <RelativeLayout
             android:id="@+id/no_search_results"
-            android:layout_below="@id/search_friends"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_below="@id/search_friends"
             android:orientation="vertical"
             android:visibility="visible"
             tools:visibility="visible">

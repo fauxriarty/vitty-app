@@ -3,22 +3,18 @@ package com.dscvit.vitty.ui.community
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.core.content.edit
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import coil.load
-import com.dscvit.vitty.BuildConfig
 import com.dscvit.vitty.R
 import com.dscvit.vitty.adapter.DayAdapter
 import com.dscvit.vitty.databinding.FragmentFriendBinding
-import com.dscvit.vitty.network.api.community.responses.user.UserResponse
 import com.dscvit.vitty.util.Constants
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.tabs.TabLayoutMediator
@@ -33,7 +29,7 @@ class FriendFragment : Fragment() {
     private val days = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
     private lateinit var communityViewModel: CommunityViewModel
     private lateinit var token: String
-    private lateinit var sharedPrefs : SharedPreferences
+    private lateinit var sharedPrefs: SharedPreferences
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -41,7 +37,8 @@ class FriendFragment : Fragment() {
     ): View {
         binding = FragmentFriendBinding.inflate(inflater, container, false)
         communityViewModel = ViewModelProvider(this)[CommunityViewModel::class.java]
-        sharedPrefs = requireActivity().getSharedPreferences(Constants.USER_INFO, Context.MODE_PRIVATE)
+        sharedPrefs =
+            requireActivity().getSharedPreferences(Constants.USER_INFO, Context.MODE_PRIVATE)
         val name = arguments?.getString("name")
         val username = arguments?.getString("username")
         val picture = arguments?.getString("profile_picture")
@@ -55,7 +52,12 @@ class FriendFragment : Fragment() {
 
     }
 
-    private fun setUpPage(name:String?, username:String?, picture:String?, friendStatus:String?) {
+    private fun setUpPage(
+        name: String?,
+        username: String?,
+        picture: String?,
+        friendStatus: String?
+    ) {
 
         binding.friendTimetableName.text = name ?: "Friend"
         binding.friendToolbar.title = username ?: "username"
@@ -74,9 +76,6 @@ class FriendFragment : Fragment() {
         setUpWithStatus(username, friendStatus)
 
 
-
-
-
     }
 
     private fun setUpWithStatus(username: String?, friendStatus: String?) {
@@ -84,12 +83,15 @@ class FriendFragment : Fragment() {
             "received" -> {
                 requestReceivedLayout()
             }
+
             "sent" -> {
                 requestSentLayout()
             }
+
             "none" -> {
                 sendRequestLayout()
             }
+
             else -> {
                 friendLayout(username)
             }
@@ -131,10 +133,11 @@ class FriendFragment : Fragment() {
     }
 
     private fun setupActions(username: String?, friendStatus: String?) {
-        if(username == null) return
+        if (username == null) return
         binding.accept.setOnClickListener {
             acceptRequest(username)
             friendLayout(username)
+
         }
         binding.reject.setOnClickListener {
             handleRejectAction(username)
@@ -267,6 +270,8 @@ class FriendFragment : Fragment() {
 
     private fun acceptRequest(username: String) {
         communityViewModel.acceptRequest(token, username)
+
+
     }
 
     private fun rejectRequest(username: String) {

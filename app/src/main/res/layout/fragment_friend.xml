@@ -11,8 +11,8 @@
         android:id="@+id/schedule_appbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:visibility="gone"
-        android:background="@color/background">
+        android:background="@color/background"
+        android:visibility="gone">
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/friend_toolbar"
@@ -33,9 +33,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:animateLayoutChanges="true">
-
-
-
 
 
         <LinearLayout
@@ -64,10 +61,10 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:padding="20dp"
                     android:layout_marginStart="10dp"
-                    android:orientation="vertical">
+                    android:gravity="center_vertical"
+                    android:orientation="vertical"
+                    android:padding="20dp">
 
                     <TextView
                         android:id="@+id/friend_timetable_name"
@@ -108,20 +105,20 @@
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/reject"
+                            style="?attr/materialButtonOutlinedStyle"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
                             android:letterSpacing="0"
-                            style="?attr/materialButtonOutlinedStyle"
                             android:text="Reject"
                             android:textAllCaps="false"
                             android:textColor="@color/white"
-                            app:rippleColor="@color/translucent"
-                            app:strokeColor="@color/next_class"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintWidth_percent="0.48"/>
+                            app:layout_constraintWidth_percent="0.48"
+                            app:rippleColor="@color/translucent"
+                            app:strokeColor="@color/next_class" />
 
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
@@ -135,8 +132,8 @@
                         android:letterSpacing="0"
                         android:text="Send Request"
                         android:textAllCaps="false"
-                        android:visibility="gone"
-                        android:textColor="@color/white" />
+                        android:textColor="@color/white"
+                        android:visibility="gone" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/requestSent"
@@ -147,8 +144,8 @@
                         android:letterSpacing="0"
                         android:text="Request Sent"
                         android:textAllCaps="false"
-                        android:visibility="gone"
-                        android:textColor="@color/white" />
+                        android:textColor="@color/white"
+                        android:visibility="gone" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/unfriend"
@@ -159,16 +156,13 @@
                         android:letterSpacing="0"
                         android:text="Friends"
                         android:textAllCaps="false"
-                        android:visibility="gone"
-                        android:textColor="@color/white" />
+                        android:textColor="@color/white"
+                        android:visibility="gone" />
 
                 </LinearLayout>
 
 
             </LinearLayout>
-
-
-
 
 
         </LinearLayout>
@@ -203,16 +197,15 @@
             android:layout_below="@+id/tabs_layout" />
 
 
-
-
     </RelativeLayout>
+
     <RelativeLayout
         android:id="@+id/not_friend"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-
         android:layout_below="@+id/placeholder_tab"
+
+        android:orientation="vertical"
         tools:visibility="visible">
 
         <ImageView
@@ -254,9 +247,6 @@
                 android:textSize="20sp" />
         </LinearLayout>
     </RelativeLayout>
-
-
-
 
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

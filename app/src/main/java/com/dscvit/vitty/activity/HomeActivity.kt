@@ -26,7 +26,7 @@ class HomeActivity : FragmentActivity() {
 
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
-            if(destination.id == R.id.allRequestFragment || destination.id == R.id.friendFragment || destination.id == R.id.searchFragment || destination.id == R.id.navigation_requests) {
+            if (destination.id == R.id.allRequestFragment || destination.id == R.id.friendFragment || destination.id == R.id.searchFragment || destination.id == R.id.navigation_requests) {
 
                 binding.navView.visibility = View.GONE
             } else {

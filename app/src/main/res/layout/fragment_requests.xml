@@ -77,11 +77,12 @@
 
         <RelativeLayout
             android:id="@+id/request_layout"
-            android:layout_below="@id/pending_requests_text_view"
-            android:layout_marginStart="20dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_below="@id/pending_requests_text_view"
+            android:layout_marginStart="20dp"
             android:visibility="gone">
+
             <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/icon"
                 android:layout_width="54dp"
@@ -91,6 +92,7 @@
                 android:adjustViewBounds="true"
                 app:shapeAppearanceOverlay="@style/roundedImageViewRounded"
                 tools:src="@tools:sample/avatars" />
+
             <TextView
                 android:id="@+id/superscriptTextView"
                 android:layout_width="25dp"
@@ -98,17 +100,18 @@
                 android:layout_marginStart="-22dp"
                 android:layout_marginTop="12dp"
                 android:layout_toEndOf="@id/icon"
-                android:padding="3dp"
+                android:background="@drawable/circular_background"
                 android:ellipsize="end"
                 android:gravity="center"
                 android:maxLines="1"
-                android:background="@drawable/circular_background"
+                android:padding="3dp"
                 android:text="2"
                 android:textColor="@color/white"
-                android:textSize="14sp"/>
+                android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/requestsHeading"
+                style="@style/TitleTextAppearance"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
@@ -116,11 +119,10 @@
                 android:layout_toEndOf="@id/icon"
                 android:ellipsize="end"
                 android:gravity="center"
-                style="@style/TitleTextAppearance"
                 android:maxLines="1"
-                android:textSize="14dp"
                 android:text="Follow Requests"
-                android:textColor="@color/white" />
+                android:textColor="@color/white"
+                android:textSize="14dp" />
 
             <TextView
                 android:id="@+id/requestsSubtext"
@@ -132,8 +134,8 @@
                 android:ellipsize="end"
                 android:gravity="center"
                 android:maxLines="1"
-                android:textSize="14dp"
-                android:text="Accept or reject requests" />
+                android:text="Accept or reject requests"
+                android:textSize="14dp" />
 
         </RelativeLayout>
 

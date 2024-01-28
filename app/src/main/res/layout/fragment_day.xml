@@ -15,9 +15,9 @@
             android:clipToPadding="false"
             android:layoutAnimation="@anim/layout_animation"
             android:paddingTop="10dp"
-            tools:listitem="@layout/card_period"
             android:paddingBottom="180dp"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            tools:listitem="@layout/card_period" />
 
         <RelativeLayout
             android:id="@+id/no_period"

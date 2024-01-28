@@ -30,27 +30,25 @@
         </com.google.android.material.appbar.AppBarLayout>
 
 
-
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/request_list"
-            android:layout_below="@id/schedule_appbar"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:visibility="visible"
+            android:layout_below="@id/schedule_appbar"
             android:clipToPadding="false"
             android:layoutAnimation="@anim/layout_animation"
             android:paddingTop="10dp"
-            tools:listitem="@layout/card_friend"
             android:paddingBottom="10dp"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
-
+            android:visibility="visible"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            tools:listitem="@layout/card_friend" />
 
 
         <RelativeLayout
             android:id="@+id/no_requests"
-            android:layout_below="@id/schedule_appbar"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_below="@id/schedule_appbar"
             android:orientation="vertical"
             android:visibility="visible"
             tools:visibility="visible">
