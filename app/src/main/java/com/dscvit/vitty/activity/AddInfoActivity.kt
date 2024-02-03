@@ -88,6 +88,9 @@ class AddInfoActivity : AppCompatActivity() {
                     startActivity(intent)
                     finish()
                 }
+            }else{
+                Toast.makeText(this, R.string.something_went_wrong, Toast.LENGTH_LONG).show()
+                binding.loadingView.visibility = View.GONE
             }
         }
 

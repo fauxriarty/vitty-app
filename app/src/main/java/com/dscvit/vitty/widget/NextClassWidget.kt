@@ -257,11 +257,6 @@ suspend fun fetchData(
                 }
             }
             today = today?.sortedBy { it.start_time }
-//                        if(today.isNullOrEmpty()){
-//                            pd.courseName = ""
-//                            updateNextClassWidget(context, appWidgetManager, appWidgetId, pd)
-//                            return@coroutineScope
-//                        }
             if (today != null) {
                 for (period in today) {
 
@@ -362,49 +357,52 @@ suspend fun fetchData(
                             }
                         }
                         today = today?.sortedBy { it.start_time }
-                        for (period in today!!) {
 
-                            try {
-                                val start = Calendar.getInstance()
-                                val s = Calendar.getInstance()
-                                s.time = parseTimeToTimestamp(period.start_time).toDate()
-                                start[Calendar.HOUR_OF_DAY] = s[Calendar.HOUR_OF_DAY]
-                                start[Calendar.MINUTE] = s[Calendar.MINUTE]
-                                Timber.d("$calendar")
-                                Timber.d("$start")
-                                if (start.time > calendar.time) {
-                                    val end = Calendar.getInstance()
-                                    val e = Calendar.getInstance()
-                                    e.time = parseTimeToTimestamp(period.end_time).toDate()
-                                    end[Calendar.HOUR_OF_DAY] = e[Calendar.HOUR_OF_DAY]
-                                    end[Calendar.MINUTE] = e[Calendar.MINUTE]
-                                    Timber.d("$end")
-                                    if (end.time > calendar.time) {
-                                        pd = PeriodDetails(
-                                            period.code,
-                                            period.name,
-                                            parseTimeToTimestamp(period.start_time),
-                                            parseTimeToTimestamp(period.end_time),
-                                            period.slot,
-                                            period.venue
-                                        )
-                                        break
+                        val todayTimetable = today
+                        if(todayTimetable != null){
+                            for (period in todayTimetable) {
+                                try {
+                                    val start = Calendar.getInstance()
+                                    val s = Calendar.getInstance()
+                                    s.time = parseTimeToTimestamp(period.start_time).toDate()
+                                    start[Calendar.HOUR_OF_DAY] = s[Calendar.HOUR_OF_DAY]
+                                    start[Calendar.MINUTE] = s[Calendar.MINUTE]
+                                    Timber.d("$calendar")
+                                    Timber.d("$start")
+                                    if (start.time > calendar.time) {
+                                        val end = Calendar.getInstance()
+                                        val e = Calendar.getInstance()
+                                        e.time = parseTimeToTimestamp(period.end_time).toDate()
+                                        end[Calendar.HOUR_OF_DAY] = e[Calendar.HOUR_OF_DAY]
+                                        end[Calendar.MINUTE] = e[Calendar.MINUTE]
+                                        Timber.d("$end")
+                                        if (end.time > calendar.time) {
+                                            pd = PeriodDetails(
+                                                period.code,
+                                                period.name,
+                                                parseTimeToTimestamp(period.start_time),
+                                                parseTimeToTimestamp(period.end_time),
+                                                period.slot,
+                                                period.venue
+                                            )
+                                            break
+                                        }
+                                    } else {
+                                        pd.courseName = ""
+                                        val simpleDateFormat =
+                                            SimpleDateFormat("h:mm a", Locale.getDefault())
+                                        val sTime: String =
+                                            simpleDateFormat.format(calendar.time)
+                                                .uppercase(Locale.ROOT)
+                                        Timber.d("LOL: $sTime")
                                     }
-                                } else {
+                                } catch (e: Exception) {
                                     pd.courseName = ""
-                                    val simpleDateFormat =
-                                        SimpleDateFormat("h:mm a", Locale.getDefault())
-                                    val sTime: String =
-                                        simpleDateFormat.format(calendar.time)
-                                            .uppercase(Locale.ROOT)
-                                    Timber.d("LOL: $sTime")
+                                    Timber.d("F: $e")
                                 }
-                            } catch (e: Exception) {
-                                pd.courseName = ""
-                                Timber.d("F: $e")
+
+
                             }
-
-
                         }
                         updateNextClassWidget(context, appWidgetManager, appWidgetId, pd)
 

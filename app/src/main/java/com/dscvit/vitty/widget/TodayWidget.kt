@@ -292,18 +292,23 @@ suspend fun fetchTodayData(
                             }
                         }
                         today = today?.sortedBy { it.start_time }
-                        for (period in today!!) {
-                            var startTime = parseTimeToTimestamp(period.start_time).toDate()
-                            var endTime = parseTimeToTimestamp(period.end_time).toDate()
+                        val todayTimeTable = today
+                        if(todayTimeTable != null) {
 
-                            val simpleDateFormat = SimpleDateFormat("h:mm a", Locale.getDefault())
-                            val sTime: String =
-                                simpleDateFormat.format(startTime).uppercase(Locale.ROOT)
-                            val eTime: String =
-                                simpleDateFormat.format(endTime).uppercase(Locale.ROOT)
-                            courseList.add(period.name)
-                            timeList.add("$sTime - $eTime")
-                            roomList.add(period.venue)
+                            for (period in todayTimeTable) {
+                                var startTime = parseTimeToTimestamp(period.start_time).toDate()
+                                var endTime = parseTimeToTimestamp(period.end_time).toDate()
+
+                                val simpleDateFormat =
+                                    SimpleDateFormat("h:mm a", Locale.getDefault())
+                                val sTime: String =
+                                    simpleDateFormat.format(startTime).uppercase(Locale.ROOT)
+                                val eTime: String =
+                                    simpleDateFormat.format(endTime).uppercase(Locale.ROOT)
+                                courseList.add(period.name)
+                                timeList.add("$sTime - $eTime")
+                                roomList.add(period.venue)
+                            }
                         }
 
                         updateTodayWidget(

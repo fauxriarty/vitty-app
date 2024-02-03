@@ -134,8 +134,8 @@ class DayFragment : Fragment() {
 
     }
 
-    private fun processTimetableData(userResponse: UserResponse) {
-        val timetableDays = userResponse.timetable?.data
+    private fun processTimetableData(userResponse: UserResponse?) {
+        val timetableDays = userResponse?.timetable?.data
         when (day) {
             "monday" -> {
                 val monday = timetableDays?.Monday
