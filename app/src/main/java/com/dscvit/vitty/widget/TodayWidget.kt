@@ -236,11 +236,16 @@ suspend fun fetchTodayData(
         }
 
 
-        if (cachedData == null) {
+
             APICommunityRestClient.instance.getUserWithTimeTable(token, username,
 
                 object : RetrofitSelfUserListener {
                     override fun onSuccess(call: Call<UserResponse>?, response: UserResponse?) {
+                        //clear the lists
+                        courseList.clear()
+                        timeList.clear()
+                        roomList.clear()
+
                         val user = response
 
                         //cache response for widget
@@ -336,7 +341,7 @@ suspend fun fetchTodayData(
 
                     }
                 })
-        }
+
 
 
     }
